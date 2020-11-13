@@ -87,6 +87,60 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noised=0.01,
     return np.asarray(spikes), VV, AA
 
 
+def multi_trials(trials, time, stimulus, model, **kwargs):
+    """ Simulate neuron model for several trials.
+
+    Parameters
+    ----------
+    trials: int
+        Number of trials to be simulated.
+    time: 1D array
+        Time vector for the model.
+    stimulus: 1D array
+        Stimulus for the model.
+    model: function
+        The model.
+    kwargs: dict
+        Parameter for the model.
+
+    Returns
+    -------
+    spikes: list of 1D arrays of floats
+        For each trial the spike times.
+    """
+    spikes = []
+    for k in range(trials):
+        s, _, _ = model(time, stimulus, **kwargs)
+        spikes.append(s)
+    return spikes
+
+
+def baseline_activity(s, tmax, model, **kwargs):
+    """ Simulate neuron model with a fixed stimulus.
+
+    Parameters
+    ----------
+    s: float
+        Stimulus value for the model.
+    tmax: float
+        Maximum integration time.
+    model: function
+        The model.
+    kwargs: dict
+        Parameter for the model.
+
+    Returns
+    -------
+    spikes: 1D arrays of floats
+        The spike times.
+    """
+    dt = 0.0001               # integration time step in seconds
+    time = np.arange(0.0, tmax, dt)
+    stimulus = np.zeros(len(time)) + s
+    spikes, _, _ = model(time, stimulus, **kwargs)
+    return spikes
+
+
 def firing_rate(time, spikes, fill=0.0):
     """ Instantaneous firing rate (1/ISI) averaged over trials.
 
@@ -123,14 +177,25 @@ def firing_rate(time, spikes, fill=0.0):
     return frate
 
 
-def plot_lifac_trial(ax):
-    tfac = 1000.0             # plots in milliseconds
+def step_stimulus(tmin, tmax, dur, s0, s1):
+    """ Step stimulus with time vector.
+    
+    Returns
+    -------
+    time: 1D array
+        Time vector.
+    stimulus: 1D array
+        Step stimulus.
+    """
     dt = 0.0001               # integration time step in seconds
-    time = np.arange(-0.2, 0.6, dt)
-    # step stimulus:
-    stimulus = np.zeros(len(time)) + 1.2
-    stimulus[(time > 0.0) & (time < 0.2)] = 4.0
-    # single trial:
+    time = np.arange(tmin, tmax+dt, dt)
+    stimulus = np.zeros(len(time)) + s0
+    stimulus[(time > 0.0) & (time < dur)] = s1
+    return time, stimulus
+
+    
+def plot_lifac_trial(ax, time, stimulus):
+    tfac = 1000.0             # plots in milliseconds
     spikes, V, A = lifac(time, stimulus)
     ax.axhline(0.0, color='k', linestyle=':', label=r'$V_r$')
     ax.axhline(1.0, color='k', linestyle='--', label=r'$\theta$')
@@ -144,76 +209,50 @@ def plot_lifac_trial(ax):
     ax.legend()
 
 
-def plot_lifac_raster(ax):
+def plot_lifac_raster(ax, time, spikes):
     tfac = 1000.0             # plots in milliseconds
-    dt = 0.0001               # integration time step in seconds
-    time = np.arange(-0.2, 0.5, dt)
-    # step stimulus:
-    stimulus = np.zeros(len(time)) + 1.2
-    stimulus[(time > 0.0) & (time < 0.2)] = 4.0
-    # raster:
-    n = 20
-    spikes = []
-    for k in range(n):
-        s, _, _ = lifac(time, stimulus)
-        spikes.append(tfac*s)
-    ax.eventplot(spikes, colors=['k'], lineoffsets=np.arange(1, n+1))
+    spks = [tfac*spikes[k] for k in range(len(spikes))]
+    ax.eventplot(spks, colors=['k'], lineoffsets=np.arange(1, len(spks)+1))
     ax.set_xlim(tfac*time[0], tfac*time[-1])
-    ax.set_ylim(0, n+1)
+    ax.set_ylim(0, len(spks)+1)
     ax.set_xlabel('Time [ms]')
     ax.set_ylabel('Trials')
+    return spikes
 
     
-def plot_lifac_serial_correlation(ax):
-    dt = 0.0001               # integration time step in seconds
-    time = np.arange(0.0, 200.0, dt)    # long integration for good statistics!
-    stimulus = np.zeros(len(time)) + 2.0
-    spikes, _, _ = lifac(time, stimulus)
-    isis = np.diff(spikes)
-    lags = np.arange(0, 6)
-    scorr = [1.0] + [np.corrcoef(isis[k:], isis[:-k])[1,0] for k in lags[1:]]
+def plot_lifac_rate(ax, time, spikes):
+    tfac = 1000.0             # plots in milliseconds
+    ratetime = np.arange(time[0], time[-1], 0.001)
+    frate = firing_rate(ratetime, spikes, 'extend')
+    ax.plot(tfac*ratetime, frate)
+    ax.set_xlim(tfac*time[0], tfac*time[-1])
+    ax.set_xlabel('Time [ms]')
+    ax.set_ylabel('Firing rate [Hz]')
+
+
+def plot_lifac_isih(ax, spikes, labels=[]):
+    tfac = 1000.0             # plots in milliseconds
+    bw = 0.0005               # bin width in milliseconds
+    for spks, l in zip(spikes, labels):
+        isis = np.diff(spks)
+        bins = np.arange((np.min(isis)//bw)*bw, (np.max(isis)//bw+1)*bw, bw)
+        ax.hist(tfac*isis, tfac*bins, label=l)
+    ax.set_xlabel('ISI')
+    ax.set_ylabel('Count')
+    ax.legend()
+
+
+def plot_lifac_serial_correlation(ax, spikes, labels=[]):
     ax.axhline(0.0, color='k', linestyle=':')
-    ax.plot(lags, scorr, '-o', color='r')
-    ax.set_ylim(-1, 1)
+    for spks, l in zip(spikes, labels):
+        isis = np.diff(spks)
+        lags = np.arange(0, 6)
+        scorr = [1.0] + [np.corrcoef(isis[k:], isis[:-k])[1,0] for k in lags[1:]]
+        ax.plot(lags, scorr, '-o', label=l)
+    ax.set_ylim(-0.5, 1)
     ax.set_xlabel('Lag')
     ax.set_ylabel('Serial correlation')
-
-    
-def plot_lifac_rate(ax):
-    n = 20                    # number of trials
-    tfac = 1000.0             # plots in milliseconds
-    dt = 0.0001               # integration time step in seconds
-    time = np.arange(-0.2, 0.6, dt)
-    # step stimulus:
-    stimulus = np.zeros(len(time)) + 1.2
-    stimulus[(time > 0.0) & (time < 0.2)] = 4.0
-    ratetime = np.arange(time[0], time[-1], 0.001)
-    spikes = []
-    for k in range(n):
-        s, _, _ = lifac(time, stimulus)
-        spikes.append(s)
-    frate = firing_rate(ratetime, spikes)
-    ax.plot(ratetime, frate)
-
-    
-def plot_lifac_prerate(ax):
-    n = 20                    # number of trials
-    tfac = 1000.0             # plots in milliseconds
-    dt = 0.0001               # integration time step in seconds
-    time = np.arange(-0.2, 0.6, dt)
-    # step stimulus:
-    stimulus = np.zeros(len(time))
-    stimulus[(time > 0.0) & (time < 0.2)] = 4.0
-    stimulus[(time > 0.2) & (time < 0.4)] = 8.0
-    ratetime = np.arange(time[0], time[-1], 0.001)
-    spikes = []
-    for k in range(n):
-        s, _, _ = lifac(time, stimulus)
-        spikes.append(s)
-    frate = firing_rate(ratetime, spikes)
-    #ax.eventplot(spikes, colors=['k'], lineoffsets=np.arange(1, n+1))
-    #ax.plot(time, stimulus)
-    ax.plot(ratetime, frate)
+    ax.legend()
 
     
 def plot_lifac_fIcurves(ax):
@@ -229,13 +268,10 @@ def plot_lifac_fIcurves(ax):
     ratetime = np.arange(time[0], time[-1], 0.001)
     for i, stim in enumerate(inputs):
         stimulus[time > 0.0] = stim
-        spikes = []
-        for k in range(n):
-            s, _, _ = lifac(time, stimulus)
-            spikes.append(s)
-        frate = firing_rate(ratetime, spikes)
+        spikes = multi_trials(20, time, stimulus, lifac)
+        frate = firing_rate(ratetime, spikes, 'extend')
         fon[i] = np.max(frate)
-        fss[i] = np.mean(frate[(ratetime>0.2)])
+        fss[i] = np.mean(frate[(ratetime>0.2) & (ratetime<0.25)])
     # adapted f-I curve:
     prestim = 4.0
     time = np.arange(-0.5, 0.3, dt)
@@ -243,30 +279,40 @@ def plot_lifac_fIcurves(ax):
     ratetime = np.arange(time[0], time[-1], 0.001)
     for i, stim in enumerate(inputs):
         stimulus[time > 0.0] = stim
-        spikes = []
-        for k in range(n):
-            s, _, _ = lifac(time, stimulus)
-            spikes.append(s)
+        spikes = multi_trials(20, time, stimulus, lifac)
         frate = firing_rate(ratetime, spikes)
         baserate = np.mean(frate[(ratetime>-0.1) & (ratetime<0.0)])
-        inx = np.argmax(np.abs(frate[(ratetime>0.002) & (ratetime<0.1)]-baserate))
-        fa[i] = frate[(ratetime>0.002) & (ratetime<0.1)][inx]
-        #plt.plot(ratetime, frate)
-        #plt.show()
+        arate = frate[(ratetime>0.0) & (ratetime<0.1)]
+        inx = np.argmax(np.abs(arate-baserate))
+        fa[i] = arate[inx]
     ax.plot(inputs, fss, 'r', label=r'$f_{\infty}(I)$')
     ax.plot(inputs, fon, 'g', label=r'$f_{0}(I)$')
     ax.plot(inputs, fa, 'b', label=r'$f_{0}(I-A)$')
     ax.set_xlabel('Stimulus')
     ax.set_ylabel('Firing rate [Hz]')
+    ax.legend()
+
+
+def lifac_demo():
+    fig, axs = plt.subplots(3, 2)
+    # step response:
+    time, stimulus = step_stimulus(-0.2, 0.8, 0.2, 1.2, 4.0)
+    spikes = multi_trials(20, time, stimulus, lifac)
+    stimulus = stimulus[time<0.6]
+    time = time[time<0.6]
+    plot_lifac_trial(axs[0,0], time, stimulus)
+    plot_lifac_raster(axs[1,0], time, spikes)
+    plot_lifac_rate(axs[2,0], time, spikes)
+    # baseline statistics:
+    inputs = [2.0, 4.0, 6.0]
+    spikes = [baseline_activity(s, 200.0, lifac) for s in inputs]
+    plot_lifac_isih(axs[0,1], spikes, ['%g' % s for s in inputs])
+    plot_lifac_serial_correlation(axs[1,1], spikes, ['%g' % s for s in inputs])
+    # f-I curves:
+    plot_lifac_fIcurves(axs[2,1])
+    plt.show()
 
         
 if __name__ == "__main__":
-    fig, axs = plt.subplots(3, 2)
-    #plot_lifac_trial(axs[0,0])
-    #plot_lifac_raster(axs[1,0])
-    #plot_lifac_rate(axs[2,0])
-    #plot_lifac_serial_correlation(axs[0,1])
-    #plot_lifac_prerate(axs[1,1])
-    plot_lifac_fIcurves(axs[2,1])
-    plt.show()
+    lifac_demo()
     
