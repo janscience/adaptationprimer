@@ -65,26 +65,27 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noised=0.01,
     return np.asarray(spikes)
 ```
 
-Use this function by first defining a time vector and an appropriate stimulus:
+Use this function by first defining a time vector and an appropriate stimulus. For example,
+a step stimulus of 0.3s duration:
 ``` py
 dt = 0.0001               # integration time step in seconds
-time = np.arange(0.0, 0.2+dt, dt)
-stimulus = np.zeros(len(time))
-stimulus[(time > 0.0) & (time < 0.1)] = 3.0
+time = np.arange(-0.2, 0.8+dt, dt)
+stimulus = np.zeros(len(time)) + 1.2
+stimulus[(time > 0.0) & (time < 0.3)] = 4.0
 ```
 The time step `dt` sets the integration time step. Make sure that it is at least
 ten times smaller than the membrane time constant.
 Then call the `lifac()` function to simulate a single trial:
-```
-spikes, v, a = lifac(time, stimulus)
 ``` py
+spikes, v, a = lifac(time, stimulus)
+```
 You then can plot the membrane voltage `v` and the adaptation current
 `a` as a function of time `time`.
 
-Or use the `multi_trials()` function to simulate several trials of the `lifac()` model
-with the same stimulus:
+Or simulate the spikes of several trials in response to the same stimulus like this:
 ``` py
-spikes = multi_trials(20, time, stimulus, lifac)
+ntrials = 20
+spikes = [lifac(time, stimulus)[0] for k in range(ntrials)]
 ```
-The returned spikes are a list of arrays with spike times of each trial.
+The resulting `spikes` are a list of arrays with spike times of each trial.
 

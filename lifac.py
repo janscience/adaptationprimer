@@ -87,34 +87,6 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noised=0.01,
     return np.asarray(spikes), VV, AA
 
 
-def multi_trials(trials, time, stimulus, model, **kwargs):
-    """ Simulate neuron model for several trials.
-
-    Parameters
-    ----------
-    trials: int
-        Number of trials to be simulated.
-    time: 1D array
-        Time vector for the model.
-    stimulus: 1D array
-        Stimulus for the model.
-    model: function
-        The model.
-    kwargs: dict
-        Parameter for the model.
-
-    Returns
-    -------
-    spikes: list of 1D arrays of floats
-        For each trial the spike times.
-    """
-    spikes = []
-    for k in range(trials):
-        s, _, _ = model(time, stimulus, **kwargs)
-        spikes.append(s)
-    return spikes
-
-
 def baseline_activity(s, tmax, model, **kwargs):
     """ Simulate neuron model with a fixed stimulus.
 
@@ -268,7 +240,7 @@ def plot_lifac_fIcurves(ax):
     ratetime = np.arange(time[0], time[-1], 0.001)
     for i, stim in enumerate(inputs):
         stimulus[time > 0.0] = stim
-        spikes = multi_trials(20, time, stimulus, lifac)
+        spikes = [lifac(time, stimulus)[0] for k in range(20)]
         frate = firing_rate(ratetime, spikes, 'extend')
         fon[i] = np.max(frate)
         fss[i] = np.mean(frate[(ratetime>0.2) & (ratetime<0.25)])
@@ -279,7 +251,7 @@ def plot_lifac_fIcurves(ax):
     ratetime = np.arange(time[0], time[-1], 0.001)
     for i, stim in enumerate(inputs):
         stimulus[time > 0.0] = stim
-        spikes = multi_trials(20, time, stimulus, lifac)
+        spikes = [lifac(time, stimulus)[0] for k in range(20)]
         frate = firing_rate(ratetime, spikes)
         baserate = np.mean(frate[(ratetime>-0.1) & (ratetime<0.0)])
         arate = frate[(ratetime>0.0) & (ratetime<0.1)]
@@ -297,7 +269,7 @@ def lifac_demo():
     fig, axs = plt.subplots(3, 2)
     # step response:
     time, stimulus = step_stimulus(-0.2, 0.8, 0.2, 1.2, 4.0)
-    spikes = multi_trials(20, time, stimulus, lifac)
+    spikes = [lifac(time, stimulus)[0] for k in range(20)]
     stimulus = stimulus[time<0.6]
     time = time[time<0.6]
     plot_lifac_trial(axs[0,0], time, stimulus)
