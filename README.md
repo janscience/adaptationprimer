@@ -2,7 +2,7 @@
 
 ## Requirements
 
-The scripts run on `python` version 3, using the following packages:
+The `python` scripts run in python version 3, using the following packages:
 
 - numpy
 - scipy
@@ -51,13 +51,10 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noised=0.01,
     spikes = []
     for k in range(len(stimulus)):
         if time[k] < tn:
-            continue                         # no integration during refractory period
-        # membrane equation:
-        V += (-V - A + stimulus[k] + noise[k])*dt/taum
-        # adaptation dynamics:
-        A += -A*dt/taua
-        # threshold condition:
-        if V > vthresh:
+            continue                 # no integration during refractory period
+        V += (-V - A + stimulus[k] + noise[k])*dt/taum    # membrane equation
+        A += -A*dt/taua                                   # adaptation dynamics
+        if V > vthresh:              # threshold condition
             V = vreset               # voltage reset
             A += alpha/taua          # adaptation increment
             tn = time[k] + tref      # refractory period
@@ -68,7 +65,7 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noised=0.01,
 Use this function by first defining a time vector and an appropriate stimulus. For example,
 a step stimulus of 0.3s duration:
 ``` py
-dt = 0.0001               # integration time step in seconds
+dt = 0.0001  # integration time step in seconds
 time = np.arange(-0.2, 0.8+dt, dt)
 stimulus = np.zeros(len(time)) + 1.2
 stimulus[(time > 0.0) & (time < 0.3)] = 4.0
@@ -82,10 +79,17 @@ spikes, v, a = lifac(time, stimulus)
 You then can plot the membrane voltage `v` and the adaptation current
 `a` as a function of time `time`.
 
+IMAGE
+
 Or simulate the spikes of several trials in response to the same stimulus like this:
 ``` py
 ntrials = 20
 spikes = [lifac(time, stimulus)[0] for k in range(ntrials)]
 ```
 The resulting `spikes` are a list of arrays with spike times of each trial.
+
+IMAGE
+
+
+## Firing rate models
 
