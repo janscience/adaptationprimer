@@ -74,7 +74,7 @@ spikes, v, a = lifac(time, stimulus)
 You then can plot the membrane voltage `v` and the adaptation current
 `a` as a function of time `time`.
 
-![stimulus](lifac-trial.png)
+![trial](lifac-trial.png)
 
 
 ## Raster plot
@@ -93,7 +93,7 @@ ax.eventplot(spks, colors=['k'], lineoffsets=np.arange(1, len(spks)+1), lw=0.5)
 ```
 Note the (black) color is given within a list.
 
-![stimulus](lifac-raster.png)
+![raster](lifac-raster.png)
 
 
 ## Firing rate
@@ -145,7 +145,7 @@ fig, ax = plt.subplots(figsize=(figwidth, 0.5*figwidth))
 ax.plot(1000.0*ratetime, frate)                   # time axis in milliseconds
 ```
 
-![stimulus](lifac-rate.png)
+![rate](lifac-rate.png)
 
 
 ## f-I curves
@@ -162,9 +162,11 @@ firing rate as the maximum rate within 50ms after stimulus onset, and
 the steady-state firing rate as the averaged rate close to the end of
 the stimulus:
 ```
+dt = 0.0001
 time = np.arange(-0.1, 0.5, dt)
 stimulus = np.zeros(len(time))
 inputs = np.arange(0, 10.1, 0.2)
+ratetime = np.arange(time[0], time[-1], 0.001)
 fon = np.zeros(len(inputs))
 fss = np.zeros(len(inputs))
 for i, stim in enumerate(inputs):
@@ -175,7 +177,28 @@ for i, stim in enumerate(inputs):
     fss[i] = np.mean(frate[(ratetime>0.35) & (ratetime<0.45)])
 ```
 
-![stimulus](lifac-ficurves.png)
+For adapted *f-I* curves the neuron needs to be preadapted to some
+stimulus value, and then the onset response to a range of inputs is
+measured. For this we need to know the steady-state response right
+before the onset of the test stimulus (`baserate`). The onset response
+is the largest deviation (positive or negative) from this rate.
+```
+prestim = 4.0
+time = np.arange(-0.5, 0.3, dt)
+stimulus = np.zeros(len(time)) + prestim
+ratetime = np.arange(time[0], time[-1], 0.001)
+fa = np.zeros(len(inputs))
+for i, stim in enumerate(inputs):
+    stimulus[time > 0.0] = stim
+    spikes = [la.lifac(time, stimulus)[0] for k in range(20)]
+    frate = la.firing_rate(ratetime, spikes)
+    baserate = np.mean(frate[(ratetime>-0.1) & (ratetime<0.0)])
+    arate = frate[(ratetime>0.0) & (ratetime<0.1)]
+    inx = np.argmax(np.abs(arate-baserate))
+    fa[i] = arate[inx]
+```
+
+![ficurves](lifac-ficurves.png)
 
 
 ## Baseline statistics
