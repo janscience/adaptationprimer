@@ -246,3 +246,17 @@ Additive noise in the adaptation dynamics results in
 Ornstein-Uhlenbeck noise in the membrane equation and thus introduces
 positive ISI correlation.
 
+
+## References
+
+> Benda J, Herz AVM (2003) A universal model for spike-frequency adaptation. *Neural Comput.* 15, 2523-2564.
+
+> Schwalger T, Fisch K, Benda J, Lindner B (2010) How noisy adaptation of neurons shapes interspike interval histograms and correlations. *PLoS Comput. Biol.* 6, e1001026.
+
+> Benda J, Maler L, Longtin A (2010) Linear versus nonlinear signal transmission in neuron models with adaptation-currents or dynamic thresholds. *J. Neurophysiol.* 104, 2806-2820.
+
+> Fisch K, Schwalger T, Lindner B, Herz AVM, Benda J (2012) Channel noise from both slow adaptation currents and fast currents is required to explain spike-response variability in a sensory neuron. *J. Neurosci.* 32, 17332-17344.
+
+> Brette R, Gerstner W. (2005) Adaptive exponential integrate-and-fire model as an effective description of neuronal activity. *J. Neurophysiol.* 94: 3637–3642.
+
+> Farkhooi F, Strube-Bloss MF, Nawrot MP (2009) Serial correlation in neural spike trains: Experimental evidence, stochastic modeling, and single neuron variability. *Phys Rev E* 79: 021905, 2009.
