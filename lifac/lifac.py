@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 
 
-def lifac(time, stimulus, taum=0.01, tref=0.003, noised=0.01,
-          vreset=0.0, vthresh=1.0, taua=0.1, alpha=0.05, rng=np.random):
+def lifac(time, stimulus, taum=0.01, tref=0.003, noisedv=0.01, vreset=0.0, vthresh=1.0,
+          taua=0.1, alpha=0.05, noiseda=0.0, rng=np.random):
     """ Leaky integrate-and-fire neuron with adaptation current.
 
     $$\\tau_m \\frac{dV}{dt} = - V + RI - A + D\\xi$$
@@ -22,6 +22,8 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noised=0.01,
         Membrane time constant, same unit as `time`.
     tref: float
         Absolute refractory period (spike width), same unit as `time`.
+    noisedv: float
+        Noise strength D of additive white noise for membrane equation.
     vreset: float
         Reset value for membrane voltage.
     vthresh: float
@@ -32,8 +34,8 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noised=0.01,
     alpha: float
         Adaptation strength. At each spike the adaptation variable is incremented by
         `alpha` divided by `taua`.
-    noised: float
-        Noise strength D.
+    noiseda: float
+        Noise strength D of additive white noise for adaptation dynamics.
     rng: random number generator with an randn() function
         Random number generator for computing the additive noise.
               
@@ -48,17 +50,18 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noised=0.01,
     """
     # time step:
     dt = time[1] - time[0]
-    # noise term properly scaled:
-    noise = rng.randn(len(stimulus))*noised/np.sqrt(dt)
+    # noise terms properly scaled:
+    noisev = rng.randn(len(stimulus))*noisedv/np.sqrt(dt)
+    noisea = rng.randn(len(stimulus))*noiseda/np.sqrt(dt)
     # initializiation for forgetting initial conditions:
     tn = time[0]
     V = rng.rand()
     A = 0.0
-    for k in range(min(1000, len(noise))):
+    for k in range(min(1000, len(noisev))):
         if time[k] < tn:
             continue
-        V += (-V - A + stimulus[0] + noise[k])*dt/taum
-        A += -A*dt/taua
+        V += (-V - A + stimulus[0] + noisev[k])*dt/taum
+        A += (-A + noisea[k])*dt/taua
         if V > vthresh:
             V = vreset
             A += alpha/taua
@@ -75,9 +78,9 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noised=0.01,
         if time[k] < tn:
             continue
         # membrane equation:
-        V += (-V - A + stimulus[k] + noise[k])*dt/taum
+        V += (-V - A + stimulus[k] + noisev[k])*dt/taum
         # adaptation dynamics:
-        A += -A*dt/taua
+        A += (-A + noisea[k])*dt/taua
         # threshold condition:
         if V > vthresh:
             V = vreset               # voltage reset
@@ -340,14 +343,14 @@ def lifac_demo():
     plot_lifac_trial(axs[0,0], time, stimulus)
     plot_raster(axs[1,0], time, spikes)
     plot_firing_rate(axs[2,0], time, spikes)
+    # f-I curves:
+    plot_lifac_fIcurves(axs[2,1])
     # baseline statistics:
     inputs = [2.0, 4.0, 6.0]
-    spikes = [baseline_activity(s, 200.0, lifac) for s in inputs]
+    spikes = [baseline_activity(s, 200.0, lifac, noiseda=0.03) for s in inputs]
     labels = ['RI=%g' % s for s in inputs]
     plot_isih(axs[0,1], spikes, labels)
     plot_serial_correlation(axs[1,1], spikes, labels)
-    # f-I curves:
-    plot_lifac_fIcurves(axs[2,1])
     plt.show()
 
         

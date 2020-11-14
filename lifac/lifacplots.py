@@ -109,7 +109,7 @@ def baseline_activity(s, tmax):
     dt = 0.0001               # integration time step in seconds
     time = np.arange(0.0, tmax, dt)
     stimulus = np.zeros(len(time)) + s
-    spikes, _, _ = la.lifac(time, stimulus)
+    spikes, _, _ = la.lifac(time, stimulus, noiseda=0.03)
     return spikes[spikes > 1.0] - 1.0   # steady-state only
 
 

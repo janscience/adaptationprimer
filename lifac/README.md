@@ -12,29 +12,32 @@ for a demo.
 The leaky integrate-and-fire neuron is extended by an adaptation current *A*:
 
 <img src=
-"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cbegin%7Balign%2A%7D%0A%5Ctau_m+%5Cfrac%7BdV%7D%7Bdt%7D+%26%3D+-+V+%2B+RI+-+A+%2B+D%5Cxi+%5C%5C%0A%5Ctau_a+%5Cfrac%7BdA%7D%7Bdt%7D+%26%3D+-A%0A%5Cend%7Balign%2A%7D%0A" 
+"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cbegin%7Balign%2A%7D%0A%5Ctau_m+%5Cfrac%7BdV%7D%7Bdt%7D+%26%3D+-+V+%2B+RI+-+A+%2B+D_v%5Cxi+%5C%5C%0A%5Ctau_a+%5Cfrac%7BdA%7D%7Bdt%7D+%26%3D+-+A+%2B+D_a%5Cxi%0A%5Cend%7Balign%2A%7D" 
 alt="\begin{align*}
-\tau_m \frac{dV}{dt} &= - V + RI - A + D\xi \\
-\tau_a \frac{dA}{dt} &= -A
-\end{align*}
-">
+\tau_m \frac{dV}{dt} &= - V + RI - A + D_v\xi \\
+\tau_a \frac{dA}{dt} &= - A + D_a\xi
+\end{align*}">
 
 The leaky integration of the membrane potential *V(t)* with membrane
-time constant *&#120591;<sub>m</sub>* is driven by a stimulus *RI* (input
-resistance *R* times injected current *I(t)*) from which the
-adaptation current *A* is subtracted. *D&#958;* is an additive white
-noise. The adaptation current is integrated with the adaptation time
-constant *&#120591;<sub>m</sub>*. Whenever the membrane voltage crosses the
-firing threshold &#952;, a spike is generated, the adaptation current
-is incremented by &#945;, the voltage is reset to *V<sub>r</sub>*, and
-integration is paused for the absolute refractory period *&#120591;<sub>r</sub>*.
+time constant *&#120591;<sub>m</sub>* is driven by a stimulus *RI*
+(input resistance *R* times injected current *I(t)*) from which the
+adaptation current *A* is subtracted. The adaptation current is
+integrated with the adaptation time constant
+*&#120591;<sub>m</sub>*. *D<sub>v</sub>&#958;* and
+*D<sub>a</sub>&#958;* are additive white noises for the membrane
+equation and adaptaion dynamics, respectively. Whenever the membrane
+voltage crosses the firing threshold &#952;, a spike is generated, the
+adaptation current is incremented by &#945;, the voltage is reset to
+*V<sub>r</sub>*, and integration is paused for the absolute refractory
+period *&#120591;<sub>r</sub>*.
 
 The `lifac()` function integrates the model using Euler forward integration:
 ``` py
-def lifac(time, stimulus, taum=0.01, tref=0.003, noised=0.01,
-          vreset=0.0, vthresh=1.0, taua=0.1, alpha=0.05, rng=np.random):
+def lifac(time, stimulus, taum=0.01, tref=0.003, noisedv=0.01,
+          vreset=0.0, vthresh=1.0, taua=0.1, alpha=0.05, noiseda=0.01, rng=np.random):
     dt = time[1] - time[0]                                # time step
-    noise = rng.randn(len(stimulus))*noised/np.sqrt(dt)   # properly scaled noise term
+    noisev = rng.randn(len(stimulus))*noisedv/np.sqrt(dt) # properly scaled voltage noise term
+    noisea = rng.randn(len(stimulus))*noiseda/np.sqrt(dt) # properly scaled adaptation noise term
     # initialization:
     tn = time[0]
     V = rng.rand()
@@ -44,8 +47,8 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noised=0.01,
     for k in range(len(stimulus)):
         if time[k] < tn:
             continue                 # no integration during refractory period
-        V += (-V - A + stimulus[k] + noise[k])*dt/taum    # membrane equation
-        A += -A*dt/taua                                   # adaptation dynamics
+        V += (-V - A + stimulus[k] + noisev[k])*dt/taum   # membrane equation
+        A += (-A + noisea[k])*dt/taua                     # adaptation dynamics
         if V > vthresh:              # threshold condition
             V = vreset               # voltage reset
             A += alpha/taua          # adaptation increment
@@ -107,8 +110,9 @@ A conceptionally different type of estimating a neuron's firing rate
 is the instantaneous firing rate. It computes the firing rate from the
 inverse inter-spike intervals at a given time point averaged over
 trials. This measure is largely independent of spike time jitter and
-instead measures interspike intervals. Consequently, at high firing
-rates temporal resultion is higher and at low firing rate it is lower.
+instead measures interspike intervals (ISI). Consequently, at high
+firing rates temporal resultion is higher and at low firing rate it is
+lower.
 
 For quantifying the dynamics of adaptation the instantaneous firing
 rate is more suitable. Neural adaptation is a surathreshold phenomenon
@@ -204,13 +208,13 @@ for i, stim in enumerate(inputs):
 ## Baseline statistics
 
 From the steady-state response to some stimulus you can compute
-interspike-interval histograms.
+interspike-interval (ISI) histograms.
 
 ``` py
 tmax = 200.0
 time = np.arange(0.0, tmax, dt)
 stimulus = np.zeros(len(time)) + 2.0
-spikes, _, _ = la.lifac(time, stimulus)
+spikes, _, _ = la.lifac(time, stimulus, noiseda=0.03)
 isis = np.diff(spikes[spikes>1.0])  # analyse steady-state only
 bw = 0.0005                         # bin width in seconds
 bins = np.arange((np.min(isis)//bw)*bw, (np.max(isis)//bw+1)*bw, bw)
@@ -219,7 +223,11 @@ ax.hist(tfac*isis, tfac*bins, density=True, label=l)
 
 ![ficurves](lifac-isih.png)
 
-Or the serial correlation between successive interspike intervals at various lags:
+The ISI histograms get longer tails when the adaptation process itself
+is noisy (`noiseda` argument to the `lifac()` function).
+
+Compute the serial correlation between successive interspike intervals
+at various lags:
 
 ``` py
 max_lag = 5
@@ -228,5 +236,13 @@ scorr = [1.0] + [np.corrcoef(isis[k:], isis[:-k])[1,0] for k in lags[1:]]
 ax.plot(lags, scorr, '-o')
 ```
 
+Adaptation and additive noise in the membrane equation introduces
+negative correlations at lag 1, i.e. long ISI intervals are followed
+by short ones and *vice versa*.
+
 ![ficurves](lifac-isicorr.png)
+
+Additive noise in the adaptation dynamics results in
+Ornstein-Uhlenbeck noise in the membrane equation and thus introduces
+positive ISI correlation.
 
