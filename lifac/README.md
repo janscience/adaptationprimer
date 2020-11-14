@@ -87,7 +87,7 @@ spikes = [lifac(time, stimulus)[0] for k in range(ntrials)]
 The resulting `spikes` are a list of arrays with spike times of each trial.
 
 They can be plotted with matplotlib's `eventplot()` function:
-```
+``` py
 fig, ax = plt.subplots()
 ax.eventplot(spks, colors=['k'], lineoffsets=np.arange(1, len(spks)+1), lw=0.5)
 ```
@@ -117,7 +117,7 @@ limit cycle, i.e. the interspike intervals.
 
 From the spike times the instantaneous firing rate can be computed for
 each time given in a `time` array as follows:
-```
+``` py
 def firing_rate(time, spikes, fill=0.0):
     zrate = 0.0 if fill == 'extend' else fill     # firing rate for empty trials
     rates = np.zeros((len(time), len(spikes)))
@@ -137,7 +137,7 @@ def firing_rate(time, spikes, fill=0.0):
 ```
 
 Compute the firing rate and plot it:
-```
+``` py
 # a new time array with less temporal resolution than the original one:
 ratetime = np.arange(time[0], time[-1], 0.001)
 frate = la.firing_rate(ratetime, spikes, 'extend')
@@ -161,7 +161,7 @@ trials, compute the instantaneous firing rate and measure the onset
 firing rate as the maximum rate within 50ms after stimulus onset, and
 the steady-state firing rate as the averaged rate close to the end of
 the stimulus:
-```
+``` py
 dt = 0.0001
 time = np.arange(-0.1, 0.5, dt)
 stimulus = np.zeros(len(time))
@@ -182,7 +182,7 @@ stimulus value, and then the onset response to a range of inputs is
 measured. For this we need to know the steady-state response right
 before the onset of the test stimulus (`baserate`). The onset response
 is the largest deviation (positive or negative) from this rate.
-```
+``` py
 prestim = 4.0
 time = np.arange(-0.5, 0.3, dt)
 stimulus = np.zeros(len(time)) + prestim
@@ -203,4 +203,8 @@ for i, stim in enumerate(inputs):
 
 ## Baseline statistics
 
+
+![ficurves](lifac-isih.png)
+
+![ficurves](lifac-isicorr.png)
 

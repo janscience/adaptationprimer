@@ -105,7 +105,49 @@ def plot_lifac_fIcurves():
     fig.savefig('lifac-ficurves')
 
 
+def baseline_activity(s, tmax):
+    dt = 0.0001               # integration time step in seconds
+    time = np.arange(0.0, tmax, dt)
+    stimulus = np.zeros(len(time)) + s
+    spikes, _, _ = la.lifac(time, stimulus)
+    return spikes
+
+
+def plot_isih(spikes, labels=[]):
+    fig, ax = plt.subplots(figsize=(figwidth, 0.5*figwidth))
+    tfac = 1000.0             # plots in milliseconds
+    bw = 0.0005               # bin width in milliseconds
+    for spks, l in zip(spikes, labels):
+        isis = np.diff(spks)
+        bins = np.arange((np.min(isis)//bw)*bw, (np.max(isis)//bw+1)*bw, bw)
+        ax.hist(tfac*isis, tfac*bins, density=True, label=l)
+    ax.set_xlim(0, 70)
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(0.1))
+    ax.set_xlabel('ISI [ms]')
+    ax.set_ylabel('pdf [kHz]')
+    ax.legend()
+    fig.savefig('lifac-isih')
+
+ 
+def plot_serial_correlation(spikes, labels=[], max_lag=5):
+    fig, ax = plt.subplots(figsize=(figwidth, 0.5*figwidth))
+    ax.axhline(0.0, color='k', linestyle=':')
+    for spks, l in zip(spikes, labels):
+        isis = np.diff(spks)
+        lags = np.arange(0, max_lag+1)
+        scorr = [1.0] + [np.corrcoef(isis[k:], isis[:-k])[1,0] for k in lags[1:]]
+        ax.plot(lags, scorr, '-o', label=l, clip_on=False)
+    ax.set_ylim(-0.5, 1)
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
+    ax.set_xlabel('Lag')
+    ax.set_ylabel('Serial correlation')
+    ax.legend()
+    fig.savefig('lifac-isicorr')
+
+
 if __name__ == "__main__":
+    """
+    # step responses:
     time, stimulus = la.step_stimulus(-0.2, 0.8, 0.2, 1.2, 4.0)
     plot_stimulus(time, stimulus)
     plot_trial(time, stimulus)
@@ -113,5 +155,12 @@ if __name__ == "__main__":
     plot_raster(time, spikes)
     plot_firing_rate(time, spikes)
     plot_lifac_fIcurves()
+    """
+    # baseline statistics:
+    inputs = [2.0, 4.0, 6.0]
+    spikes = [baseline_activity(s, 200.0) for s in inputs]
+    labels = ['RI=%g' % s for s in inputs]
+    plot_isih(spikes, labels)
+    plot_serial_correlation(spikes, labels)
 
 

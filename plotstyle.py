@@ -7,6 +7,7 @@ plt.rcParams['savefig.dpi'] = 200.0
 plt.rcParams['figure.constrained_layout.use'] = True
 plt.rcParams['font.size'] = 5.0
 plt.rcParams['lines.linewidth'] = 0.8
+plt.rcParams['lines.markersize'] = 4
 plt.rcParams['axes.xmargin'] = 0.0
 plt.rcParams['axes.ymargin'] = 0.0
 plt.rcParams['axes.spines.top'] = False
