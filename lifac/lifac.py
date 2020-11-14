@@ -159,11 +159,11 @@ def baseline_activity(s, tmax, model, **kwargs):
     spikes: 1D arrays of floats
         The spike times.
     """
-    dt = 0.0001               # integration time step in seconds
+    dt = 0.0001                         # integration time step in seconds
     time = np.arange(0.0, tmax, dt)
     stimulus = np.zeros(len(time)) + s
     spikes, _, _ = model(time, stimulus, **kwargs)
-    return spikes
+    return spikes[spikes > 1.0] - 1.0   # steady-state only
 
     
 def plot_lifac_trial(ax, time, stimulus):
@@ -247,16 +247,16 @@ def plot_isih(ax, spikes, labels=[]):
         For each trial a label describing the condition.
     """
     tfac = 1000.0             # plots in milliseconds
-    bw = 0.0005               # bin width in milliseconds
+    bw = 0.0005               # bin width in seconds
     for spks, l in zip(spikes, labels):
         isis = np.diff(spks)
         bins = np.arange((np.min(isis)//bw)*bw, (np.max(isis)//bw+1)*bw, bw)
-        ax.hist(tfac*isis, tfac*bins, label=l)
-    ax.set_xlabel('ISI')
-    ax.set_ylabel('Count')
+        ax.hist(tfac*isis, tfac*bins, density=True, label=l)
+    ax.set_xlabel('ISI [ms]')
+    ax.set_ylabel('pdf [kHz]')
     ax.legend()
 
-
+ 
 def plot_serial_correlation(ax, spikes, labels=[], max_lag=5):
     """ Serial correlations of interspike intervals for each trial.
 

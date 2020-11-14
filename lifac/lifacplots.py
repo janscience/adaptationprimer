@@ -110,13 +110,13 @@ def baseline_activity(s, tmax):
     time = np.arange(0.0, tmax, dt)
     stimulus = np.zeros(len(time)) + s
     spikes, _, _ = la.lifac(time, stimulus)
-    return spikes
+    return spikes[spikes > 1.0] - 1.0   # steady-state only
 
 
 def plot_isih(spikes, labels=[]):
     fig, ax = plt.subplots(figsize=(figwidth, 0.5*figwidth))
     tfac = 1000.0             # plots in milliseconds
-    bw = 0.0005               # bin width in milliseconds
+    bw = 0.0004               # bin width in seconds
     for spks, l in zip(spikes, labels):
         isis = np.diff(spks)
         bins = np.arange((np.min(isis)//bw)*bw, (np.max(isis)//bw+1)*bw, bw)
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     plot_lifac_fIcurves()
     """
     # baseline statistics:
-    inputs = [2.0, 4.0, 6.0]
+    inputs = [2.0, 4.0, 8.0]
     spikes = [baseline_activity(s, 200.0) for s in inputs]
     labels = ['RI=%g' % s for s in inputs]
     plot_isih(spikes, labels)

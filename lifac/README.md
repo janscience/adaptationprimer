@@ -177,7 +177,7 @@ for i, stim in enumerate(inputs):
     fss[i] = np.mean(frate[(ratetime>0.35) & (ratetime<0.45)])
 ```
 
-For adapted *f-I* curves the neuron needs to be preadapted to some
+For an adapted *f-I* curves the neuron needs to be preadapted to some
 stimulus value, and then the onset response to a range of inputs is
 measured. For this we need to know the steady-state response right
 before the onset of the test stimulus (`baserate`). The onset response
@@ -203,8 +203,30 @@ for i, stim in enumerate(inputs):
 
 ## Baseline statistics
 
+From the steady-state response to some stimulus you can compute
+interspike-interval histograms.
+
+``` py
+tmax = 200.0
+time = np.arange(0.0, tmax, dt)
+stimulus = np.zeros(len(time)) + 2.0
+spikes, _, _ = la.lifac(time, stimulus)
+isis = np.diff(spikes[spikes>1.0])  # analyse steady-state only
+bw = 0.0005                         # bin width in seconds
+bins = np.arange((np.min(isis)//bw)*bw, (np.max(isis)//bw+1)*bw, bw)
+ax.hist(tfac*isis, tfac*bins, density=True, label=l)
+```
 
 ![ficurves](lifac-isih.png)
+
+Or the serial correlation between successive interspike intervals at various lags:
+
+``` py
+max_lag = 5
+lags = np.arange(0, max_lag+1)
+scorr = [1.0] + [np.corrcoef(isis[k:], isis[:-k])[1,0] for k in lags[1:]]
+ax.plot(lags, scorr, '-o')
+```
 
 ![ficurves](lifac-isicorr.png)
 
