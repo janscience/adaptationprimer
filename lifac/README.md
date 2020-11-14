@@ -82,6 +82,15 @@ You then can plot the membrane voltage `v` and the adaptation current
 
 ![trial](lifac-trial.png)
 
+> How does the dynamics change if you change
+> - adaptation strength
+> - adaptation time constant
+> - noise strength of membrane voltage or adaptation dynamics
+
+Change these parameters by passing them to the `lifac()` function like this:
+```
+spikes, v, a = lifac(time, stimulus, taua=5, noisedv=0.1)
+```
 
 ## Raster plot
 
@@ -154,6 +163,10 @@ ax.plot(1000.0*ratetime, frate)                   # time axis in milliseconds
 
 ![rate](lifac-rate.png)
 
+> Try different values for the 
+> - adaptation strength
+> - adaptation time constant
+
 
 ## f-I curves
 
@@ -208,6 +221,14 @@ for i, stim in enumerate(inputs):
 
 ![ficurves](lifac-ficurves.png)
 
+> How does the adaptated *f-I* curve behave if you change the value of
+> the preadaptation stimulus?
+
+> Again, try different values for the 
+> - adaptation strength
+> - adaptation time constant
+> How do they influence the shape of the *f-I* curves?
+
 
 ## Baseline statistics
 
@@ -251,6 +272,11 @@ Additive noise in the adaptation dynamics results in
 Ornstein-Uhlenbeck noise in the membrane equation and thus introduces
 positive ISI correlation (see Schwalger et al., 2010, Fisch et al.,
 2012, Farkhooi et al., 2009).
+
+> How do the ISI histograms and the ISI correlations change if you modify
+> - the noise strength on the membrane equation
+> - the noise strength on the adaptation dynamics
+> - the stimulus value
 
 
 ## References
