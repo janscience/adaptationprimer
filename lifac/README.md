@@ -9,7 +9,10 @@ for a demo.
 
 ## The model
 
-The leaky integrate-and-fire neuron is extended by an adaptation current *A*:
+The leaky integrate-and-fire neuron is extended by an adaptation
+current *A* (Brette and Gerstner, 2005, Benda et al., 2010, see also
+Brette and gerstner, 2005, for the exponential integrate-and-fire
+neuron with adaptation):
 
 <img src=
 "https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cbegin%7Balign%2A%7D%0A%5Ctau_m+%5Cfrac%7BdV%7D%7Bdt%7D+%26%3D+-+V+%2B+RI+-+A+%2B+D_v%5Cxi+%5C%5C%0A%5Ctau_a+%5Cfrac%7BdA%7D%7Bdt%7D+%26%3D+-+A+%2B+D_a%5Cxi%0A%5Cend%7Balign%2A%7D" 
@@ -117,7 +120,7 @@ lower.
 For quantifying the dynamics of adaptation the instantaneous firing
 rate is more suitable. Neural adaptation is a surathreshold phenomenon
 with limit cycle firing. Firing is characterized by the period of the
-limit cycle, i.e. the interspike intervals.
+limit cycle, i.e. the interspike intervals (Benda and Herz, 2003).
 
 From the spike times the instantaneous firing rate can be computed for
 each time given in a `time` array as follows:
@@ -157,7 +160,8 @@ ax.plot(1000.0*ratetime, frate)                   # time axis in milliseconds
 Three types of *f-I* curves are useful for quantifying adapting
 neuronal responses: (i) the onset *f-I* curve of the unadapted neuron,
 (ii) the steady-state *f-I* curve, and (iii) adapted *f-I* curves,
-i.e. onset *f-I* curves measured for a preadapted neuron.
+i.e. onset *f-I* curves measured for a preadapted neuron (Benda and
+Herz, 2003).
 
 For the first two we loop over a range of stimulus values (`inputs`),
 set the stimulus to the input values, integrate the model for several
@@ -224,7 +228,8 @@ ax.hist(tfac*isis, tfac*bins, density=True, label=l)
 ![ficurves](lifac-isih.png)
 
 The ISI histograms get longer tails when the adaptation process itself
-is noisy (`noiseda` argument to the `lifac()` function).
+is noisy (`noiseda` argument to the `lifac()` function) (see Schwalger
+et al., 2010, Fisch et al., 2012).
 
 Compute the serial correlation between successive interspike intervals
 at various lags:
@@ -244,19 +249,20 @@ by short ones and *vice versa*.
 
 Additive noise in the adaptation dynamics results in
 Ornstein-Uhlenbeck noise in the membrane equation and thus introduces
-positive ISI correlation.
+positive ISI correlation (see Schwalger et al., 2010, Fisch et al.,
+2012, Farkhooi et al., 2009).
 
 
 ## References
 
 > Benda J, Herz AVM (2003) A universal model for spike-frequency adaptation. *Neural Comput.* 15, 2523-2564.
 
-> Schwalger T, Fisch K, Benda J, Lindner B (2010) How noisy adaptation of neurons shapes interspike interval histograms and correlations. *PLoS Comput. Biol.* 6, e1001026.
-
 > Benda J, Maler L, Longtin A (2010) Linear versus nonlinear signal transmission in neuron models with adaptation-currents or dynamic thresholds. *J. Neurophysiol.* 104, 2806-2820.
-
-> Fisch K, Schwalger T, Lindner B, Herz AVM, Benda J (2012) Channel noise from both slow adaptation currents and fast currents is required to explain spike-response variability in a sensory neuron. *J. Neurosci.* 32, 17332-17344.
 
 > Brette R, Gerstner W. (2005) Adaptive exponential integrate-and-fire model as an effective description of neuronal activity. *J. Neurophysiol.* 94: 3637–3642.
 
 > Farkhooi F, Strube-Bloss MF, Nawrot MP (2009) Serial correlation in neural spike trains: Experimental evidence, stochastic modeling, and single neuron variability. *Phys Rev E* 79: 021905, 2009.
+
+> Fisch K, Schwalger T, Lindner B, Herz AVM, Benda J (2012) Channel noise from both slow adaptation currents and fast currents is required to explain spike-response variability in a sensory neuron. *J. Neurosci.* 32, 17332-17344.
+
+> Schwalger T, Fisch K, Benda J, Lindner B (2010) How noisy adaptation of neurons shapes interspike interval histograms and correlations. *PLoS Comput. Biol.* 6, e1001026.
