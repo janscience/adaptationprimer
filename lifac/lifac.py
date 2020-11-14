@@ -211,7 +211,6 @@ def plot_raster(ax, time, spikes):
     ax.set_ylim(0, len(spks)+1)
     ax.set_xlabel('Time [ms]')
     ax.set_ylabel('Trials')
-    return spikes
 
     
 def plot_firing_rate(ax, time, spikes):
