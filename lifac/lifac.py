@@ -114,7 +114,7 @@ def firing_rate(time, spikes, fill=0.0):
         if len(spikes[k]) > 2:
             fv = (1.0/isis[0], 1.0/isis[-1]) if fill == 'extend' else (fill, fill)
             fr = interp1d(spikes[k][:-1], 1.0/isis, kind='previous',
-                        bounds_error=False, fill_value=fv)
+                          bounds_error=False, fill_value=fv)
             rate = fr(time)
         else:
             rate = np.zeros(len(time)) + zv

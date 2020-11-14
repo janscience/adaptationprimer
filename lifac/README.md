@@ -6,6 +6,9 @@ python3 lifac.py
 ```
 for a demo.
 
+
+## The model
+
 The leaky integrate-and-fire neuron is extended by an adaptation current *A*:
 
 <img src=
@@ -73,12 +76,108 @@ You then can plot the membrane voltage `v` and the adaptation current
 
 ![stimulus](lifac-trial.png)
 
-Or simulate the spikes of several trials in response to the same stimulus like this:
+
+## Raster plot
+
+Simulate the spikes of several trials in response to the same stimulus like this:
 ``` py
 ntrials = 20
 spikes = [lifac(time, stimulus)[0] for k in range(ntrials)]
 ```
 The resulting `spikes` are a list of arrays with spike times of each trial.
 
+They can be plotted with matplotlib's `eventplot()` function:
+```
+fig, ax = plt.subplots()
+ax.eventplot(spks, colors=['k'], lineoffsets=np.arange(1, len(spks)+1), lw=0.5)
+```
+Note the (black) color is given within a list.
+
 ![stimulus](lifac-raster.png)
+
+
+## Firing rate
+
+The standard PSTH requires a bin width for estimating the probability
+of firing within a given time interval. This measure is sensitive to
+the temporal precision of neuron's response to a stimulus. It is
+independent of the history of the spike train.
+
+A conceptionally different type of estimating a neuron's firing rate
+is the instantaneous firing rate. It computes the firing rate from the
+inverse inter-spike intervals at a given time point averaged over
+trials. This measure is largely independent of spike time jitter and
+instead measures interspike intervals. Consequently, at high firing
+rates temporal resultion is higher and at low firing rate it is lower.
+
+For quantifying the dynamics of adaptation the instantaneous firing
+rate is more suitable. Neural adaptation is a surathreshold phenomenon
+with limit cycle firing. Firing is characterized by the period of the
+limit cycle, i.e. the interspike intervals.
+
+From the spike times the instantaneous firing rate can be computed for
+each time given in a `time` array as follows:
+```
+def firing_rate(time, spikes, fill=0.0):
+    zrate = 0.0 if fill == 'extend' else fill     # firing rate for empty trials
+    rates = np.zeros((len(time), len(spikes)))
+    for k in range(len(spikes)):                  # loop through trials
+        isis = np.diff(spikes[k])                 # compute interspike intervals
+        if len(spikes[k]) > 2:
+	    # interpolate inverse ISIs at `time`:
+            fv = (1.0/isis[0], 1.0/isis[-1]) if fill == 'extend' else (fill, fill)
+            fr = interp1d(spikes[k][:-1], 1.0/isis, kind='previous',
+                          bounds_error=False, fill_value=fv)
+            rate = fr(time)
+        else:
+            rate = np.zeros(len(time)) + zrate
+        rates[:,k] = rate
+    frate = np.mean(rates, 1)                     # average over trials
+    return frate
+```
+
+Compute the firing rate and plot it:
+```
+# a new time array with less temporal resolution than the original one:
+ratetime = np.arange(time[0], time[-1], 0.001)
+frate = la.firing_rate(ratetime, spikes, 'extend')
+fig, ax = plt.subplots(figsize=(figwidth, 0.5*figwidth))
+ax.plot(1000.0*ratetime, frate)                   # time axis in milliseconds
+```
+
+![stimulus](lifac-rate.png)
+
+
+## f-I curves
+
+Three types of *f-I* curves are useful for quantifying adapting
+neuronal responses: (i) the onset *f-I* curve of the unadapted neuron,
+(ii) the steady-state *f-I* curve, and (iii) adapted *f-I* curves,
+i.e. onset *f-I* curves measured for a preadapted neuron.
+
+For the first two we loop over a range of stimulus values (`inputs`),
+set the stimulus to the input values, integrate the model for several
+trials, compute the instantaneous firing rate and measure the onset
+firing rate as the maximum rate within 50ms after stimulus onset, and
+the steady-state firing rate as the averaged rate close to the end of
+the stimulus:
+```
+time = np.arange(-0.1, 0.5, dt)
+stimulus = np.zeros(len(time))
+inputs = np.arange(0, 10.1, 0.2)
+fon = np.zeros(len(inputs))
+fss = np.zeros(len(inputs))
+for i, stim in enumerate(inputs):
+    stimulus[time > 0.0] = stim
+    spikes = [lifac(time, stimulus)[0] for k in range(20)]
+    frate = firing_rate(ratetime, spikes, 'extend')
+    fon[i] = np.max(frate[(ratetime>0.0) & (ratetime<0.05)])
+    fss[i] = np.mean(frate[(ratetime>0.35) & (ratetime<0.45)])
+```
+
+![stimulus](lifac-ficurves.png)
+
+
+## Baseline statistics
+
 
