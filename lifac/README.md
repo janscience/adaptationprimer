@@ -303,3 +303,8 @@ Farkhooi et al., 2009).
 > Rauch A, Camera GL, Lüscher HR, Senn W, Fusi S (2003) Neocortical pyramidal cells respond as integrate-and-fire neurons to in vivo-like input currents. *J Neurophysiol* 90: 1598-1612.
 
 > Schwalger T, Fisch K, Benda J, Lindner B (2010) How noisy adaptation of neurons shapes interspike interval histograms and correlations. *PLoS Comput. Biol.* 6, e1001026.
+
+
+## Next
+
+Continue reading about [spike-frequency adaptation models](../sfa/README.md).

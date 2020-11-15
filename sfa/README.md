@@ -85,7 +85,7 @@ alt="\int_{-\frac{T}{2}}^{+\frac{T}{2}} f(t) \, dt = 1">
 
 This can be applied on the firing rates returned by the adaptation
 model as follows:
-```
+``` py
 def isi_lowpass(time, rate, time_centered=False):
     dt = time[1] - time[0]                           # integration time step
     # extend spike frequency on both ends to avoid edge effects:

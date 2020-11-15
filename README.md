@@ -17,7 +17,7 @@ neuron. Augmented with a generic adaptation current it reproduces many
 features of intrinsically adapting neurons. [Read more.](lifac/README.md)
 
 
-## Firing rate models
+## Spike-frequency adaptation models
 
 Spike-frequency adaptation is a phenomenon of the spike
 frequency. Modeling adaptation on the level of spike freuqencies is
