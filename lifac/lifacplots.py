@@ -4,7 +4,7 @@ import matplotlib.ticker as ticker
 import lifac as la
 import sys
 sys.path.insert(0, '..')
-from plotstyle import figwidth
+from plotstyle import figwidth, colors
 
 
 def plot_stimulus(time, stimulus):
@@ -94,9 +94,9 @@ def plot_lifac_fIcurves():
         inx = np.argmax(np.abs(arate-baserate))
         fa[i] = arate[inx]
     fig, ax = plt.subplots(figsize=(figwidth, 0.6*figwidth))
-    ax.plot(inputs, fss, 'r', label=r'$f_{\infty}(I)$')
-    ax.plot(inputs, fon, 'g', label=r'$f_{0}(I)$')
-    ax.plot(inputs, fa, 'b', label=r'$f_{a}(I)$')
+    ax.plot(inputs, fss, colors['red'], label=r'$f_{\infty}(I)$')
+    ax.plot(inputs, fon, colors['green'], label=r'$f_{0}(I)$')
+    ax.plot(inputs, fa, colors['blue'], label=r'$f_{a}(I)$')
     ax.set_xlabel('Stimulus')
     ax.set_ylabel('Firing rate [Hz]')
     ax.set_ylim(0, 250)
@@ -146,7 +146,6 @@ def plot_serial_correlation(spikes, labels=[], max_lag=5):
 
 
 if __name__ == "__main__":
-    """
     # step responses:
     time, stimulus = la.step_stimulus(-0.2, 0.8, 0.2, 1.2, 4.0)
     plot_stimulus(time, stimulus)
@@ -155,7 +154,6 @@ if __name__ == "__main__":
     plot_raster(time, spikes)
     plot_firing_rate(time, spikes)
     plot_lifac_fIcurves()
-    """
     # baseline statistics:
     inputs = [2.0, 4.0, 8.0]
     spikes = [baseline_activity(s, 200.0) for s in inputs]
