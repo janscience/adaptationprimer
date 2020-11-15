@@ -30,7 +30,7 @@ f &= f_0(I-A) \\
 ">
 
 where *&#120591;<sub>a</sub>* is the adaptation time constant, &#945;
-is the adaptation strength, *f(t)$ is the spike frequency,
+is the adaptation strength, *f(t)* is the spike frequency,
 *f<sub>0</sub>(I)* is the onset (unadapted) *f-I* curve, *I(t)* the
 input, and *A(t)* is the adaptation level, i.e. the temporally
 averaged adaptation current.
@@ -39,9 +39,9 @@ Let's model a saturating onset *f-I* curve by the upper half of a
 Boltzman function:
 
 <img src=
-"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cbegin%7Balign%2A%7D%0Af_0%28I%29+%26%3D+%5Cleft%5C%7B+%5Cbegin%7Barray%7D%7Brcl%7D+%5Cfrac%7B2%7D%7B1%2Be%5E%7B-k%2A%28I-I_0%29%7D%7D+-+1+%26+%3B+%26+I+%3E+I_0+%5C%5C+0+%26+%3B+%26+I+%3C+I_0+%5Cend%7Barray%7D+%5Cright.%0A%5Cend%7Balign%2A%7D%0A" 
+"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cbegin%7Balign%2A%7D%0Af_0%28I%29+%26%3D+%5Cleft%5C%7B+%5Cbegin%7Barray%7D%7Brcl%7D+f_%7B%5Crm+max%7D%5Cfrac%7B2%7D%7B1%2Be%5E%7B-k%28I-I_0%29%7D%7D+-+1+%26+%3B+%26+I+%3E+I_0+%5C%5C+0+%26+%3B+%26+I+%3C+I_0+%5Cend%7Barray%7D+%5Cright.%0A%5Cend%7Balign%2A%7D%0A" 
 alt="\begin{align*}
-f_0(I) &= \left\{ \begin{array}{rcl} \frac{2}{1+e^{-k*(I-I_0)}} - 1 & ; & I > I_0 \\ 0 & ; & I < I_0 \end{array} \right.
+f_0(I) &= \left\{ \begin{array}{rcl} f_{\rm max}\frac{2}{1+e^{-k(I-I_0)}} - 1 & ; & I > I_0 \\ 0 & ; & I < I_0 \end{array} \right.
 \end{align*}
 ">
 
@@ -56,18 +56,54 @@ def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, taum=0.01, slope=4.0
     adapt = np.zeros(len(stimulus))
     a = 0.0
     f = 0.0
+    # integrate to steady-state of first stimulus value:
     for k in range(int(3*taua//dt)):
         a += (alpha*f - a)*dt/taua
         f = f0(stimulus[0] - a)
+    # integrate:
     for k in range(len(stimulus)):
-        a += (alpha*f - a)*dt/taua
-        if taum < 2*dt:
-            f = f0(stimulus[k] - a)
-        else:
-            f += (f0(stimulus[k] - a) - f)*dt/taum
         adapt[k] = a
         output[k] = f
+        a += (alpha*f - a)*dt/taua
+        f = f0(stimulus[k] - a)
     return output, adapt
+```
+
+
+## Spike generator
+
+The spike frequency, i.e. the inverse interspike intervals, can not
+follow arbitrary fast changes of the input stimulus. To a first
+approximation, a neuron integrates the firing rate along its limit
+cycle. The time *T* it needs to get once around the limit cycle,
+i.e. the interspike interval, is reached when the integral over the
+firing rate equals one:
+
+<img src=
+"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cint_%7B-%5Cfrac%7BT%7D%7B2%7D%7D%5E%7B%2B%5Cfrac%7BT%7D%7B2%7D%7D+f%28t%29+%5C%2C+dt+%3D+1" 
+alt="\int_{-\frac{T}{2}}^{+\frac{T}{2}} f(t) \, dt = 1">
+
+This can be applied on the firing rates returned by the adaptation
+model as follows:
+```
+def isi_lowpass(time, rate, time_centered=False):
+    dt = time[1] - time[0]                           # integration time step
+    # extend spike frequency on both ends to avoid edge effects:
+    lidx = int(np.ceil(1.0/rate[0]/dt))+1 if rate[0] > 0.0 else len(rate)
+    ridx = int(np.ceil(1.0/rate[-1]/dt))+1 if rate[-1] > 0.0 else len(rate)
+    rr = np.hstack(([rate[0]]*lidx, rate, [rate[-1]]*ridx))
+    tt = np.arange(len(rr))*dt + time[0] - lidx*dt   # new time array  
+    # integrate the firing rate to a phase:
+    phi = np.cumsum(rr)*dt
+    # find integration limits:
+    t0 = np.interp(phi-0.5, phi, tt)
+    t1 = np.interp(phi+0.5, phi, tt)
+    frate = 1.0/(t1 - t0)
+    if time_centered:
+        tc = (t0 + t1)/2.0
+        return np.interp(time, tc, frate)
+    else:
+        return frate[lidx:-ridx]
 ```
 
 
