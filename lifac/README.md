@@ -1,4 +1,4 @@
-# LIFAC: leaky integrate-and-fire with adaptation current
+# Leaky integrate-and-fire with adaptation current
 
 Run
 ``` sh
@@ -9,10 +9,10 @@ for a demo.
 
 ## The model
 
-The leaky integrate-and-fire neuron is extended by an adaptation
-current *A* (Brette and Gerstner, 2005, Benda et al., 2010, see also
-Brette and gerstner, 2005, for the exponential integrate-and-fire
-neuron with adaptation):
+The leaky integrate-and-fire neuron (LIF) is extended by an adaptation
+current *A* (LIFAC, Rauch et al., 2003, Jolivet et al., 2008, Benda et
+al., 2010, see Brette and Gerstner, 2005, for the exponential
+integrate-and-fire neuron with adaptation):
 
 <img src=
 "https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cbegin%7Balign%2A%7D%0A%5Ctau_m+%5Cfrac%7BdV%7D%7Bdt%7D+%26%3D+-+V+%2B+RI+-+A+%2B+D_v%5Cxi+%5C%5C%0A%5Ctau_a+%5Cfrac%7BdA%7D%7Bdt%7D+%26%3D+-+A+%2B+D_a%5Cxi%0A%5Cend%7Balign%2A%7D" 
@@ -43,7 +43,7 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noisedv=0.01,
     noisea = rng.randn(len(stimulus))*noiseda/np.sqrt(dt) # properly scaled adaptation noise term
     # initialization:
     tn = time[0]
-    V = rng.rand()
+    V = rng.rand()*(vthresh-vreset) + vreset
     A = 0.0
     # integration:
     spikes = []
@@ -82,19 +82,19 @@ You then can plot the membrane voltage `v` and the adaptation current
 
 ![trial](lifac-trial.png)
 
-> How does the dynamics change if you change
+> How does the dynamics change if you modify
 > - adaptation strength
 > - adaptation time constant
 > - noise strength of membrane voltage or adaptation dynamics
 
-Change these parameters by passing them to the `lifac()` function like this:
+Set these parameters by passing them to the `lifac()` function like this:
 ```
 spikes, v, a = lifac(time, stimulus, taua=5, noisedv=0.1)
 ```
 
 ## Raster plot
 
-Simulate the spikes of several trials in response to the same stimulus like this:
+Simulate the spikes of several trials in response to the same stimulus:
 ``` py
 ntrials = 20
 spikes = [lifac(time, stimulus)[0] for k in range(ntrials)]
@@ -104,7 +104,7 @@ The resulting `spikes` are a list of arrays with spike times of each trial.
 They can be plotted with matplotlib's `eventplot()` function:
 ``` py
 fig, ax = plt.subplots()
-ax.eventplot(spks, colors=['k'], lineoffsets=np.arange(1, len(spks)+1), lw=0.5)
+ax.eventplot(spikes, colors=['k'], lineoffsets=np.arange(1, len(spks)+1), lw=0.5)
 ```
 Note the (black) color is given within a list.
 
@@ -113,10 +113,10 @@ Note the (black) color is given within a list.
 
 ## Firing rate
 
-The standard PSTH requires a bin width for estimating the probability
-of firing within a given time interval. This measure is sensitive to
-the temporal precision of neuron's response to a stimulus. It is
-independent of the history of the spike train.
+A peri-stimulus time histogram requires a bin width for estimating the
+probability of firing within a given time interval. This measure is
+sensitive to the temporal precision of neuron's response to a
+stimulus. It is independent of the history of the spike train.
 
 A conceptionally different type of estimating a neuron's firing rate
 is the instantaneous firing rate. It computes the firing rate from the
@@ -285,10 +285,14 @@ positive ISI correlation (see Schwalger et al., 2010, Fisch et al.,
 
 > Benda J, Maler L, Longtin A (2010) Linear versus nonlinear signal transmission in neuron models with adaptation-currents or dynamic thresholds. *J. Neurophysiol.* 104, 2806-2820.
 
-> Brette R, Gerstner W. (2005) Adaptive exponential integrate-and-fire model as an effective description of neuronal activity. *J. Neurophysiol.* 94: 3637–3642.
+> Brette R, Gerstner W. (2005) Adaptive exponential integrate-and-fire model as an effective description of neuronal activity. *J. Neurophysiol.* 94: 3637-3642.
 
 > Farkhooi F, Strube-Bloss MF, Nawrot MP (2009) Serial correlation in neural spike trains: Experimental evidence, stochastic modeling, and single neuron variability. *Phys Rev E* 79: 021905, 2009.
 
 > Fisch K, Schwalger T, Lindner B, Herz AVM, Benda J (2012) Channel noise from both slow adaptation currents and fast currents is required to explain spike-response variability in a sensory neuron. *J. Neurosci.* 32, 17332-17344.
+
+> Jolivet R, Kobayashi R, Rauch A, Naud R, Shinomoto S, Gerstner W (2008) A benchmark test for a quantitative assessment of simple neuron models. *J Neurosci Methods* 169: 417-424.
+
+> Rauch A, Camera GL, Lüscher HR, Senn W, Fusi S (2003) Neocortical pyramidal cells respond as integrate-and-fire neurons to in vivo-like input currents. *J Neurophysiol* 90: 1598-1612.
 
 > Schwalger T, Fisch K, Benda J, Lindner B (2010) How noisy adaptation of neurons shapes interspike interval histograms and correlations. *PLoS Comput. Biol.* 6, e1001026.

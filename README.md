@@ -9,7 +9,7 @@ The `python` scripts run in python version 3, using the following packages:
 - matplotlib
 
 
-## LIFAC: leaky integrate-and-fire with adaptation current
+## Leaky integrate-and-fire with adaptation current
 
 The leaky integrate-and-fire model is a simple model of a spiking
 neuron. Augmented with a generic adaptation current it reproduces many

@@ -55,7 +55,7 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noisedv=0.01, vreset=0.0, vthre
     noisea = rng.randn(len(stimulus))*noiseda/np.sqrt(dt)
     # initializiation for forgetting initial conditions:
     tn = time[0]
-    V = rng.rand()
+    V = rng.rand()*(vthresh-vreset) + vreset
     A = 0.0
     for k in range(min(1000, len(noisev))):
         if time[k] < tn:
