@@ -45,7 +45,10 @@ f_0(I) &= \left\{ \begin{array}{rcl} f_{\rm max}\frac{2}{1+e^{-k(I-I_0)}} - 1 & 
 \end{align*}
 ">
 
-With that we can implement the model using the Euler forward method:
+where *f<sub>max</sub>* is the maximum firing rate, *I<sub>0</sub>* is the rheobase, i.e. the position of the *f-I* curve on the stimulus axis, and *k* sets the slope of the dynamic range.
+
+Using this parametrization of the onset *f-I* curve we can implement
+the model using the Euler forward method:
 ``` py
 def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, taum=0.01, slope=4.0, I0=0.0):
     # sigmoidal onset f-I curve:
