@@ -1,12 +1,13 @@
 # Neural Adaptation Primer
 
+
 ## Requirements
 
 The `python` scripts run in python version 3, using the following packages:
 
 - numpy
-- scipy
-- matplotlib
+- scipy >= 1.2.0
+- matplotlib >= 2.2.0
 
 
 ## Leaky integrate-and-fire with adaptation current
@@ -17,6 +18,10 @@ features of intrinsically adapting neurons. [Read more.](lifac/README.md)
 
 
 ## Firing rate models
+
+Spike-frequency adaptation is a phenomenon of the spike
+frequency. Modeling adaptation on the level of spike freuqencies is
+thus a natural choice. [Read more.](sfa/README.md)
 
 
 ## Contributing

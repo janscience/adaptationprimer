@@ -49,10 +49,10 @@ def plot_raster(time, spikes):
     fig.savefig('lifac-raster')
 
     
-def plot_firing_rate(time, spikes):
+def plot_spike_frequency(time, spikes):
     tfac = 1000.0             # plots in milliseconds
     ratetime = np.arange(time[0], time[-1], 0.001)
-    frate = la.firing_rate(ratetime, spikes, 'extend')
+    frate = la.spike_frequency(ratetime, spikes, 'extend')
     fig, ax = plt.subplots(figsize=(figwidth, 0.5*figwidth))
     ax.plot(tfac*ratetime, frate)
     ax.set_xlim(tfac*time[0], tfac*time[-1])
@@ -77,7 +77,7 @@ def plot_lifac_fIcurves():
     for i, stim in enumerate(inputs):
         stimulus[time > 0.0] = stim
         spikes = [la.lifac(time, stimulus)[0] for k in range(20)]
-        frate = la.firing_rate(ratetime, spikes, 'extend')
+        frate = la.spike_frequency(ratetime, spikes, 'extend')
         fon[i] = np.max(frate)
         fss[i] = np.mean(frate[(ratetime>0.2) & (ratetime<0.25)])
     # adapted f-I curve:
@@ -88,7 +88,7 @@ def plot_lifac_fIcurves():
     for i, stim in enumerate(inputs):
         stimulus[time > 0.0] = stim
         spikes = [la.lifac(time, stimulus)[0] for k in range(20)]
-        frate = la.firing_rate(ratetime, spikes)
+        frate = la.spike_frequency(ratetime, spikes)
         baserate = np.mean(frate[(ratetime>-0.1) & (ratetime<0.0)])
         arate = frate[(ratetime>0.0) & (ratetime<0.1)]
         inx = np.argmax(np.abs(arate-baserate))
@@ -152,7 +152,7 @@ if __name__ == "__main__":
     plot_trial(time, stimulus)
     spikes = [la.lifac(time, stimulus)[0] for k in range(20)]
     plot_raster(time, spikes)
-    plot_firing_rate(time, spikes)
+    plot_spike_frequency(time, spikes)
     plot_lifac_fIcurves()
     # baseline statistics:
     inputs = [2.0, 4.0, 8.0]

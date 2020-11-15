@@ -114,7 +114,7 @@ Note the (black) color is given within a list.
 ![raster](lifac-raster.png)
 
 
-## Firing rate
+## Spike frequency
 
 A peri-stimulus time histogram requires a bin width for estimating the
 probability of firing within a given time interval. This measure is
@@ -122,22 +122,25 @@ sensitive to the temporal precision of neuron's response to a
 stimulus. It is independent of the history of the spike train.
 
 A conceptionally different type of estimating a neuron's firing rate
-is the instantaneous firing rate. It computes the firing rate from the
-inverse inter-spike intervals at a given time point averaged over
-trials. This measure is largely independent of spike time jitter and
-instead measures interspike intervals (ISI). Consequently, at high
-firing rates temporal resultion is higher and at low firing rate it is
+is the "instantaneous firing rate" or "spike frequency". It computes
+the firing rate from the inverse inter-spike intervals at a given time
+point averaged over trials. This measure is largely independent of
+spike time jitter and instead measures interspike intervals (ISI). No
+bin or kernel width is required. At high firing rates temporal
+resultion of spike freuency is higher and at low firing rate it is
 lower.
 
-For quantifying the dynamics of adaptation the instantaneous firing
-rate is more suitable. Neural adaptation is a surathreshold phenomenon
-with limit cycle firing. Firing is characterized by the period of the
-limit cycle, i.e. the interspike intervals (Benda and Herz, 2003).
+For quantifying the dynamics of adaptation spike freqeuncy is more
+suitable. Neural adaptation is a surathreshold phenomenon with limit
+cycle firing. Firing is characterized by the period of the limit
+cycle, i.e. the interspike intervals (Benda and Herz, 2003).
 
-From the spike times the instantaneous firing rate can be computed for
-each time given in a `time` array as follows:
+From the spike times the spike frequency can be computed for each time
+given in a `time` array as follows:
 ``` py
-def firing_rate(time, spikes, fill=0.0):
+from scipy.interpolate import interp1d
+
+def spike_frequency(time, spikes, fill=0.0):
     zrate = 0.0 if fill == 'extend' else fill     # firing rate for empty trials
     rates = np.zeros((len(time), len(spikes)))
     for k in range(len(spikes)):                  # loop through trials
@@ -159,7 +162,7 @@ Compute the firing rate and plot it:
 ``` py
 # a new time array with less temporal resolution than the original one:
 ratetime = np.arange(time[0], time[-1], 0.001)
-frate = la.firing_rate(ratetime, spikes, 'extend')
+frate = spike_frequency(ratetime, spikes, 'extend')
 fig, ax = plt.subplots(figsize=(figwidth, 0.5*figwidth))
 ax.plot(1000.0*ratetime, frate)                   # time axis in milliseconds
 ```
@@ -196,7 +199,7 @@ fss = np.zeros(len(inputs))
 for i, stim in enumerate(inputs):
     stimulus[time > 0.0] = stim
     spikes = [lifac(time, stimulus)[0] for k in range(20)]
-    frate = firing_rate(ratetime, spikes, 'extend')
+    frate = spike_frequency(ratetime, spikes, 'extend')
     fon[i] = np.max(frate[(ratetime>0.0) & (ratetime<0.05)])
     fss[i] = np.mean(frate[(ratetime>0.35) & (ratetime<0.45)])
 ```
@@ -214,8 +217,8 @@ ratetime = np.arange(time[0], time[-1], 0.001)
 fa = np.zeros(len(inputs))
 for i, stim in enumerate(inputs):
     stimulus[time > 0.0] = stim
-    spikes = [la.lifac(time, stimulus)[0] for k in range(20)]
-    frate = la.firing_rate(ratetime, spikes)
+    spikes = [lifac(time, stimulus)[0] for k in range(20)]
+    frate = spike_frequency(ratetime, spikes)
     baserate = np.mean(frate[(ratetime>-0.1) & (ratetime<0.0)])
     arate = frate[(ratetime>0.0) & (ratetime<0.1)]
     inx = np.argmax(np.abs(arate-baserate))
@@ -243,7 +246,7 @@ interspike-interval (ISI) histograms.
 tmax = 200.0
 time = np.arange(0.0, tmax, dt)
 stimulus = np.zeros(len(time)) + 2.0
-spikes, _, _ = la.lifac(time, stimulus, noiseda=0.03)
+spikes, _, _ = lifac(time, stimulus, noiseda=0.03)
 isis = np.diff(spikes[spikes>1.0])  # analyse steady-state only
 bw = 0.0005                         # bin width in seconds
 bins = np.arange((np.min(isis)//bw)*bw, (np.max(isis)//bw+1)*bw, bw)

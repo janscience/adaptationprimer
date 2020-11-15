@@ -90,7 +90,7 @@ def lifac(time, stimulus, taum=0.01, tref=0.003, noisedv=0.01, vreset=0.0, vthre
     return np.asarray(spikes), VV, AA
 
 
-def firing_rate(time, spikes, fill=0.0):
+def spike_frequency(time, spikes, fill=0.0):
     """ Instantaneous firing rate (1/ISI) averaged over trials.
 
     Parameters
@@ -216,7 +216,7 @@ def plot_raster(ax, time, spikes):
     ax.set_ylabel('Trials')
 
     
-def plot_firing_rate(ax, time, spikes):
+def plot_spike_frequency(ax, time, spikes):
     """ Plot instantaneous firing rate computed from spikes.
 
     Parameters
@@ -230,7 +230,7 @@ def plot_firing_rate(ax, time, spikes):
     """
     tfac = 1000.0             # plots in milliseconds
     ratetime = np.arange(time[0], time[-1], 0.001)
-    frate = firing_rate(ratetime, spikes, 'extend')
+    frate = spike_frequency(ratetime, spikes, 'extend')
     ax.plot(tfac*ratetime, frate)
     ax.set_xlim(tfac*time[0], tfac*time[-1])
     ax.set_xlabel('Time [ms]')
@@ -307,7 +307,7 @@ def plot_lifac_fIcurves(ax):
     for i, stim in enumerate(inputs):
         stimulus[time > 0.0] = stim
         spikes = [lifac(time, stimulus)[0] for k in range(20)]
-        frate = firing_rate(ratetime, spikes, 'extend')
+        frate = spike_frequency(ratetime, spikes, 'extend')
         fon[i] = np.max(frate)
         fss[i] = np.mean(frate[(ratetime>0.2) & (ratetime<0.25)])
     # adapted f-I curve:
@@ -318,7 +318,7 @@ def plot_lifac_fIcurves(ax):
     for i, stim in enumerate(inputs):
         stimulus[time > 0.0] = stim
         spikes = [lifac(time, stimulus)[0] for k in range(20)]
-        frate = firing_rate(ratetime, spikes)
+        frate = spike_frequency(ratetime, spikes)
         baserate = np.mean(frate[(ratetime>-0.1) & (ratetime<0.0)])
         arate = frate[(ratetime>0.0) & (ratetime<0.1)]
         inx = np.argmax(np.abs(arate-baserate))
@@ -342,7 +342,7 @@ def lifac_demo():
     time = time[time<0.6]
     plot_lifac_trial(axs[0,0], time, stimulus)
     plot_raster(axs[1,0], time, spikes)
-    plot_firing_rate(axs[2,0], time, spikes)
+    plot_spike_frequency(axs[2,0], time, spikes)
     # f-I curves:
     plot_lifac_fIcurves(axs[2,1])
     # baseline statistics:
