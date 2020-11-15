@@ -230,6 +230,7 @@ for i, stim in enumerate(inputs):
 > Again, try different values for the 
 > - adaptation strength
 > - adaptation time constant
+>
 > How do they influence the shape of the *f-I* curves?
 
 
@@ -252,7 +253,7 @@ ax.hist(tfac*isis, tfac*bins, density=True, label=l)
 ![ficurves](lifac-isih.png)
 
 The ISI histograms get longer tails when the adaptation process itself
-is noisy (`noiseda` argument to the `lifac()` function) (see Schwalger
+is noisy (`noiseda` argument of the `lifac()` function) (see Schwalger
 et al., 2010, Fisch et al., 2012).
 
 Compute the serial correlation between successive interspike intervals
@@ -273,13 +274,13 @@ by short ones and *vice versa*.
 
 Additive noise in the adaptation dynamics results in
 Ornstein-Uhlenbeck noise in the membrane equation and thus introduces
-positive ISI correlation (see Schwalger et al., 2010, Fisch et al.,
-2012, Farkhooi et al., 2009).
+positive ISI correlations (Schwalger et al., 2010, Fisch et al., 2012,
+Farkhooi et al., 2009).
 
 > How do the ISI histograms and the ISI correlations change if you modify
 > - the noise strength on the membrane equation
 > - the noise strength on the adaptation dynamics
-> - the stimulus value
+> - the stimulus value and thus the average firing rate?
 
 
 ## References
