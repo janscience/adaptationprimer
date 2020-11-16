@@ -72,8 +72,6 @@ def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, f
     return rate, adapt
 ```
 
-![stepresponse](sfa-stepresponse.png)
-
 The spike-frequency response to a step can be computed and plotted like this:
 ```
 time = np.arange(-0.05, 0.3, 0.001)
@@ -83,6 +81,12 @@ rate, adapt = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
 axf.plot(1000.0*time, rate, 'b')
 axa.plot(1000.0*time, adapt, 'r')
 ```
+
+![stepresponse](sfa-stepresponse.png)
+
+Note that the effective time constant of adaptation during the step is
+much faster than the one after the step (Benda and Herz, 2003).
+
 
 ## Spike generator
 
@@ -124,6 +128,13 @@ Note that this is not a low-pass filter with a fixed cutoff
 frequency. The cutoff frequency depends on the current spike
 frequency. Fast fluctuations in the stimulus can be better resolved
 with a high spike frequency (Knight, 1972).
+
+Just run this function on the rate returned by the adaptation model:
+```
+frate = isi_lowpass(time, rate)
+```
+
+![isilowpass](sfa-isilowpass.png)
 
 
 ## References

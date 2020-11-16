@@ -62,8 +62,29 @@ def plot_stepresponse():
     axa.set_ylabel('Adaptation')
     fig.savefig('sfa-stepresponse')
 
+
+def plot_isi_lowpass():
+    """ Plot spike frequency and adaptation level in response to step.
+    """
+    tfac = 1000.0             # plots in milliseconds
+    dt = 0.0001               # integration time step in seconds
+    time = np.arange(-0.05, 0.3+dt, dt)
+    stimulus = np.zeros(len(time)) + 1.0
+    stimulus[(time > 0.0) & (time < 0.1)] = 3.0
+    rate, adapt = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+    frate = sfa.isi_lowpass(time, rate)
+    fig, ax = plt.subplots(figsize=(figwidth, 0.4*figwidth))
+    ax.plot(tfac*time, rate, label=r'$f_0(I-A)$', zorder=10, clip_on=False)
+    ax.plot(tfac*time, frate, label=r'$\langle f(t) \rangle_T$', zorder=10, clip_on=False)
+    ax.set_ylabel('Spike frequency [Hz]')
+    ax.set_xlabel('Time [ms]')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(100.0))
+    ax.legend(loc='upper right')
+    fig.savefig('sfa-isilowpass')
         
 if __name__ == "__main__":
     plot_sigmoid()
     plot_stepresponse()
+    plot_isi_lowpass()
+
     
