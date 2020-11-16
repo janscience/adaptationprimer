@@ -35,7 +35,7 @@ def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, f
     dt = time[1] - time[0]
     # integrate to steady-state of first stimulus value:
     a = 0.0
-    for k in range(int(3*taua//dt)):
+    for k in range(int(5*taua//dt)):
         f = f0(stimulus[0] - a)
         a += (alpha*f - a)*dt/taua
     # integrate:

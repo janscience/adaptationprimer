@@ -56,7 +56,7 @@ def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, f
     dt = time[1] - time[0]
     # integrate to steady-state of first stimulus value:
     a = 0.0
-    for k in range(int(3*taua//dt)):
+    for k in range(int(5*taua//dt)):
         f = f0(stimulus[0] - a)
         a += (alpha*f - a)*dt/taua
     # integrate:
@@ -107,6 +107,11 @@ def isi_lowpass(time, rate, time_centered=False):
         return frate[lidx:-ridx]
 ```
 
+Note that this is not a low-pass filter with a fixed cutoff
+frequency. The cutoff frequency depends on the current spike
+frequency. Fast fluctuations in the stimulus can be better resolved
+with a high spike frequency (Knight, 1972).
+
 
 ## References
 
@@ -115,3 +120,5 @@ def isi_lowpass(time, rate, time_centered=False):
 > Benda J, Hennig RM (2008) Dynamics of intensity invariance in a primary auditory interneuron. *J Comput Neurosci* 24: 113-136.
 
 > Benda J, Longtin A, Maler L (2005) Spike-frequency adaptation separates transient communication signals from background oscillations. *J Neurosci* 25: 2312-2321.
+
+> Knight, BW (1972) Dynamics of encoding in a population of neurons. *J Gen Physiol* 59: 734-766.
