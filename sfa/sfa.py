@@ -30,20 +30,22 @@ def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, f
     adapt: 1D array
         The time course of the adaptation level.
     """
+    # sigmoidal onset f-I curve:
     f0 = lambda I: fmax*(2.0/(1.0+np.exp(-slope*(I-I0))) - 1.0) if I > I0 else 0.0
     dt = time[1] - time[0]
+    # integrate to steady-state of first stimulus value:
+    a = 0.0
+    for k in range(int(3*taua//dt)):
+        f = f0(stimulus[0] - a)
+        a += (alpha*f - a)*dt/taua
+    # integrate:
     rate = np.zeros(len(stimulus))
     adapt = np.zeros(len(stimulus))
-    a = 0.0
-    f = 0.0
-    for k in range(int(3*taua//dt)):
-        a += (alpha*f - a)*dt/taua
-        f = f0(stimulus[0] - a)
     for k in range(len(stimulus)):
         adapt[k] = a
         rate[k] = f
-        a += (alpha*f - a)*dt/taua
         f = f0(stimulus[k] - a)
+        a += (alpha*f - a)*dt/taua
     return rate, adapt
 
 

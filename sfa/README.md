@@ -50,26 +50,24 @@ where *f<sub>max</sub>* is the maximum firing rate, *I<sub>0</sub>* is the rheob
 Using this parametrization of the onset *f-I* curve we can implement
 the model using the Euler forward method:
 ``` py
-def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, taum=0.01, slope=4.0, I0=0.0):
+def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, fmax=200.0):
     # sigmoidal onset f-I curve:
-    f0 = lambda I: 2.0/(1.0+np.exp(-slope*(I-I0))) - 1.0 if I > I0 else 0.0
-    dt = time[1] - time[0]           # integration time step
-    # initialization:
-    output = np.zeros(len(stimulus))
-    adapt = np.zeros(len(stimulus))
-    a = 0.0
-    f = 0.0
+    f0 = lambda I: fmax*(2.0/(1.0+np.exp(-slope*(I-I0))) - 1.0) if I > I0 else 0.0
+    dt = time[1] - time[0]
     # integrate to steady-state of first stimulus value:
+    a = 0.0
     for k in range(int(3*taua//dt)):
-        a += (alpha*f - a)*dt/taua
         f = f0(stimulus[0] - a)
+        a += (alpha*f - a)*dt/taua
     # integrate:
+    rate = np.zeros(len(stimulus))
+    adapt = np.zeros(len(stimulus))
     for k in range(len(stimulus)):
         adapt[k] = a
-        output[k] = f
-        a += (alpha*f - a)*dt/taua
+        rate[k] = f
         f = f0(stimulus[k] - a)
-    return output, adapt
+        a += (alpha*f - a)*dt/taua
+    return rate, adapt
 ```
 
 
