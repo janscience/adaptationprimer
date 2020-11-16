@@ -49,7 +49,6 @@ where *f<sub>max</sub>* is the maximum firing rate, *I<sub>0</sub>* is the rheob
 
 ![sigmoid](sfa-sigmoid.png)
 
-
 Using this parametrization of the onset *f-I* curve we can implement
 the model using the Euler forward method:
 ``` py
@@ -73,6 +72,17 @@ def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, f
     return rate, adapt
 ```
 
+![stepresponse](sfa-stepresponse.png)
+
+The spike-frequency response to a step can be computed and plotted like this:
+```
+time = np.arange(-0.05, 0.3, 0.001)
+stimulus = np.zeros(len(time)) + 1.0
+stimulus[(time > 0.0) & (time < 0.1)] = 3.0
+rate, adapt = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+axf.plot(1000.0*time, rate, 'b')
+axa.plot(1000.0*time, adapt, 'r')
+```
 
 ## Spike generator
 

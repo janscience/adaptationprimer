@@ -48,17 +48,16 @@ def plot_stepresponse():
     """
     tfac = 1000.0             # plots in milliseconds
     dt = 0.0001               # integration time step in seconds
-    time = np.arange(-0.2, 0.5+dt, dt)
+    time = np.arange(-0.05, 0.3+dt, dt)
     stimulus = np.zeros(len(time)) + 1.0
     stimulus[(time > 0.0) & (time < 0.1)] = 3.0
     rate, adapt = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
-    frate = sfa.isi_lowpass(time, rate)
-    fig, (axf, axa) = plt.subplots(2, 1, figsize=(figwidth, 0.6*figwidth))
-    axf.plot(tfac*time, rate)
-    axf.plot(tfac*time, frate)
-    axf.set_xlabel('Time [ms]')
+    fig, (axf, axa) = plt.subplots(2, 1, figsize=(figwidth, 0.6*figwidth), sharex=True)
+    axf.plot(tfac*time, rate, color=colors['blue'], zorder=10, clip_on=False)
     axf.set_ylabel('Spike frequency [Hz]')
-    axa.plot(tfac*time, adapt)
+    axf.xaxis.set_major_locator(ticker.MultipleLocator(100.0))
+    axa.plot(tfac*time, adapt, color=colors['red'], clip_on=False)
+    axa.set_ylim(0, 3)
     axa.set_xlabel('Time [ms]')
     axa.set_ylabel('Adaptation')
     fig.savefig('sfa-stepresponse')
