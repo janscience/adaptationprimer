@@ -88,6 +88,56 @@ Note that the effective time constant of adaptation during the step is
 much faster than the one after the step (Benda and Herz, 2003).
 
 
+## *f-I* curves
+
+By definition of the model, the onset *f-I* curve is
+*f<sub>0</sub>(I)* and the adapted *f-I* curves *f<sub>a</sub>(I) =
+f<sub>0</sub>(I-A)* are shifted versions of it. For a linear onset
+*f-I* curve, *f<sub>0</sub>(I)=cI* the resulting steady-state *f-I*
+curve reads
+
+<img src=
+"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+f_%7B%5Cinfty%7D+%3D+%5Cfrac%7BI%7D%7B1%2Fc+%2B+%5Calpha%7D" 
+alt="f_{\infty} = \frac{I}{1/c + \alpha}">
+
+Increasing adaptation strengh &#945; reduces the gain of the
+steady-state *f-I* curve.
+
+For non-linear *f-I* curves we can compute the steady-state f-I curve
+and the adapted *f-I* curves numerically:
+
+```
+dt = 0.0001               # integration time step in seconds
+time = np.arange(-0.05, 0.5, dt)
+inputs = np.arange(-2, 6.1, 0.1)
+# onset and steady state f-I curves:
+stimulus = np.zeros(len(time))
+f0 = []
+fs = []
+for s in inputs:
+    stimulus[time>0.0] = s
+    rate, _ = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+    f0.append(np.max(rate))
+    fs.append(rate[-1])
+# one adapted f-I curve:
+time = np.arange(-0.05, 0.1, dt)
+stimulus = np.zeros(len(time)) + 2.0
+fa = []
+for s in inputs:
+    stimulus[time>0.0] = s
+    rate, _ = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+    fb = np.mean(rate[(time>-0.05)&(time<0.0)])
+    arate = rate[(time>0.0) & (time<0.1)]
+    inx = np.argmax(np.abs(arate-fb))
+    fa.append(arate[inx])
+```
+
+![ficurves](sfa-ficurves.png)
+
+Note the linearizing effect of adaptation on the steady-state *f-I* curve
+(Ermentrout, 1998).
+
+
 ## Spike generator
 
 The spike frequency, i.e. the inverse interspike intervals, can not
@@ -144,5 +194,7 @@ frate = isi_lowpass(time, rate)
 > Benda J, Hennig RM (2008) Dynamics of intensity invariance in a primary auditory interneuron. *J Comput Neurosci* 24: 113-136.
 
 > Benda J, Longtin A, Maler L (2005) Spike-frequency adaptation separates transient communication signals from background oscillations. *J Neurosci* 25: 2312-2321.
+
+> Ermentrout B (1998) Linearization of f-I curves by adaptation. *Neural Comput* 10: 1721-1729.
 
 > Knight, BW (1972) Dynamics of encoding in a population of neurons. *J Gen Physiol* 59: 734-766.

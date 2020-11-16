@@ -82,9 +82,48 @@ def plot_isi_lowpass():
     ax.legend(loc='upper right')
     fig.savefig('sfa-isilowpass')
         
+
+def plot_ficurves():
+    """ Plot f-I curves
+    """
+    dt = 0.0001               # integration time step in seconds
+    time = np.arange(-0.05, 0.5, dt)
+    inputs = np.arange(-2, 6.1, 0.1)
+    stimulus = np.zeros(len(time))
+    f0 = []
+    fs = []
+    for s in inputs:
+        stimulus[time>0.0] = s
+        rate, _ = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+        f0.append(np.max(rate))
+        fs.append(rate[-1])
+    time = np.arange(-0.05, 0.1, dt)
+    stimulus = np.zeros(len(time)) + 2.0
+    fa = []
+    for s in inputs:
+        stimulus[time>0.0] = s
+        rate, _ = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+        fb = np.mean(rate[(time>-0.05)&(time<0.0)])
+        arate = rate[(time>0.0) & (time<0.1)]
+        inx = np.argmax(np.abs(arate-fb))
+        fa.append(arate[inx])
+    fig, ax = plt.subplots(figsize=(figwidth, 0.5*figwidth))
+    ax.plot(inputs, f0, c=colors['green'], label=r'$f_0(I)$', zorder=20, clip_on=False)
+    ax.plot(inputs, fs, c=colors['red'], label=r'$f_{\infty}(I)$', zorder=10, clip_on=False)
+    ax.plot(inputs, fa, c=colors['blue'], label=r'$f_{a}(I)$', zorder=10, clip_on=False)
+    ax.set_ylim(0, 200)
+    ax.set_ylabel('Spike frequency [Hz]')
+    ax.set_xlabel('Stimulus')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(2.0))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(50.0))
+    ax.legend(loc='upper left')
+    fig.savefig('sfa-ficurves')
+
+            
 if __name__ == "__main__":
     plot_sigmoid()
     plot_stepresponse()
     plot_isi_lowpass()
+    plot_ficurves()
 
     
