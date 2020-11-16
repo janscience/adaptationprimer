@@ -47,19 +47,31 @@ f_0(I) &= \left\{ \begin{array}{rcl} f_{\rm max}\frac{2}{1+e^{-k(I-I_0)}} - 1 & 
 
 where *f<sub>max</sub>* is the maximum firing rate, *I<sub>0</sub>* is the rheobase, i.e. the position of the *f-I* curve on the stimulus axis, and *k* sets the slope of the dynamic range.
 
+Here is the code for both scalars and arrays as inputs:
+``` py
+def upper_boltzmann(I, fmax=1.0, I0=0.0, slope=1.0):
+    rate = fmax*(2.0/(1.0+np.exp(-slope*(I-I0))) - 1.0)
+    if np.isscalar(rate):
+        if rate < 0.0:
+            rate = 0.0
+    else:
+        rate[rate<0] = 0.0
+    return rate
+```
+
 ![sigmoid](sfa-sigmoid.png)
+
+> Plot the `upper_boltzmann()` function for various values of the three parameters.
 
 Using this parametrization of the onset *f-I* curve we can implement
 the model using the Euler forward method:
 ``` py
-def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, fmax=200.0):
-    # sigmoidal onset f-I curve:
-    f0 = lambda I: fmax*(2.0/(1.0+np.exp(-slope*(I-I0))) - 1.0) if I > I0 else 0.0
+def adaptation(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, fmax=200.0):
     dt = time[1] - time[0]
     # integrate to steady-state of first stimulus value:
     a = 0.0
     for k in range(int(5*taua//dt)):
-        f = f0(stimulus[0] - a)
+        f = upper_boltzmann(stimulus[0] - a, fmax, I0, slope)
         a += (alpha*f - a)*dt/taua
     # integrate:
     rate = np.zeros(len(stimulus))
@@ -67,17 +79,17 @@ def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, f
     for k in range(len(stimulus)):
         adapt[k] = a
         rate[k] = f
-        f = f0(stimulus[k] - a)
+        f = upper_boltzmann(stimulus[k] - a, fmax, I0, slope)
         a += (alpha*f - a)*dt/taua
     return rate, adapt
 ```
 
 The spike-frequency response to a step can be computed and plotted like this:
-```
+``` py
 time = np.arange(-0.05, 0.3, 0.001)
 stimulus = np.zeros(len(time)) + 1.0
 stimulus[(time > 0.0) & (time < 0.1)] = 3.0
-rate, adapt = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+rate, adapt = sfa.adaptation(time, stimulus, alpha=0.05)
 axf.plot(1000.0*time, rate, 'b')
 axa.plot(1000.0*time, adapt, 'r')
 ```
@@ -86,6 +98,11 @@ axa.plot(1000.0*time, adapt, 'r')
 
 Note that the effective time constant of adaptation during the step is
 much faster than the one after the step (Benda and Herz, 2003).
+
+> Compute the step response for various values of the
+> - adaptation strength
+> - adaptation time constant
+> - values of the step stimulus
 
 
 ## *f-I* curves
@@ -106,7 +123,7 @@ steady-state *f-I* curve.
 For non-linear *f-I* curves we can compute the steady-state f-I curve
 and the adapted *f-I* curves numerically:
 
-```
+``` py
 dt = 0.0001               # integration time step in seconds
 time = np.arange(-0.05, 0.5, dt)
 inputs = np.arange(-2, 6.1, 0.1)
@@ -116,7 +133,7 @@ f0 = []
 fs = []
 for s in inputs:
     stimulus[time>0.0] = s
-    rate, _ = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+    rate, _ = sfa.adaptation(time, stimulus, alpha=0.05)
     f0.append(np.max(rate))
     fs.append(rate[-1])
 # one adapted f-I curve:
@@ -125,7 +142,7 @@ stimulus = np.zeros(len(time)) + 2.0
 fa = []
 for s in inputs:
     stimulus[time>0.0] = s
-    rate, _ = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+    rate, _ = sfa.adaptation(time, stimulus, alpha=0.05)
     fb = np.mean(rate[(time>-0.05)&(time<0.0)])
     arate = rate[(time>0.0) & (time<0.1)]
     inx = np.argmax(np.abs(arate-fb))
@@ -136,6 +153,10 @@ for s in inputs:
 
 Note the linearizing effect of adaptation on the steady-state *f-I* curve
 (Ermentrout, 1998).
+
+> Compute *f-I* curves for various values of the
+> - adaptation strength
+> - adaptation time constant
 
 
 ## Spike generator
@@ -185,6 +206,10 @@ frate = isi_lowpass(time, rate)
 ```
 
 ![isilowpass](sfa-isilowpass.png)
+
+> Compare the low-pass filtered rate with the spike frequency returned
+> from the model for a pulse train as a stimulus. Vary the frequency
+> and the duty cycle of the pulses.
 
 
 ## References
