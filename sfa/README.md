@@ -47,6 +47,9 @@ f_0(I) &= \left\{ \begin{array}{rcl} f_{\rm max}\frac{2}{1+e^{-k(I-I_0)}} - 1 & 
 
 where *f<sub>max</sub>* is the maximum firing rate, *I<sub>0</sub>* is the rheobase, i.e. the position of the *f-I* curve on the stimulus axis, and *k* sets the slope of the dynamic range.
 
+![sigmoid](sfa-sigmoid.png)
+
+
 Using this parametrization of the onset *f-I* curve we can implement
 the model using the Euler forward method:
 ``` py

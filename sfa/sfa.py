@@ -2,6 +2,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def upper_boltzmann(x, ymax=1.0, x0=0.0, slope=1.0):
+    """ Upper half of Boltzmann as a sigmoidal function.
+
+    Parameters
+    ----------
+    x: float or array
+        X-value(s) for which to compute the sigmoidal function.
+    ymax: float
+        Maximum y-value at saturation.
+    x0: float
+        Position (foot point) of the sigmoidal.
+    slope: float
+        Slope factor of the sigmoidal.
+
+    Returns
+    -------
+    y: float or array
+        The sigmoidal function for each x value.
+    """
+    y = ymax*(2.0/(1.0+np.exp(-slope*(x-x0))) - 1.0)
+    if np.isscalar(y):
+        if y < 0.0:
+            y = 0.0
+    else:
+        y[y<0] = 0.0
+    return y
+
+
 def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, fmax=200.0):
     """ Spike-frequency of an adaptating neuron with sigmoidal onset f-I curve.
 
