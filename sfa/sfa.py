@@ -30,7 +30,7 @@ def upper_boltzmann(x, ymax=1.0, x0=0.0, slope=1.0):
     return y
 
 
-def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, fmax=200.0):
+def adaptation(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, fmax=200.0):
     """ Spike-frequency of an adaptating neuron with sigmoidal onset f-I curve.
 
     Parameters
@@ -58,13 +58,11 @@ def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, f
     adapt: 1D array
         The time course of the adaptation level.
     """
-    # sigmoidal onset f-I curve:
-    f0 = lambda I: fmax*(2.0/(1.0+np.exp(-slope*(I-I0))) - 1.0) if I > I0 else 0.0
     dt = time[1] - time[0]
     # integrate to steady-state of first stimulus value:
     a = 0.0
     for k in range(int(5*taua//dt)):
-        f = f0(stimulus[0] - a)
+        f = upper_boltzmann(stimulus[0] - a, fmax, I0, slope)
         a += (alpha*f - a)*dt/taua
     # integrate:
     rate = np.zeros(len(stimulus))
@@ -72,7 +70,7 @@ def adaptation_sigmoid(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, f
     for k in range(len(stimulus)):
         adapt[k] = a
         rate[k] = f
-        f = f0(stimulus[k] - a)
+        f = upper_boltzmann(stimulus[k] - a, fmax, I0, slope)
         a += (alpha*f - a)*dt/taua
     return rate, adapt
 
@@ -125,7 +123,7 @@ def plot_step(axf, axa):
     time = np.arange(-0.2, 0.5+dt, dt)
     stimulus = np.zeros(len(time)) + 1.0
     stimulus[(time > 0.0) & (time < 0.1)] = 3.0
-    rate, adapt = adaptation_sigmoid(time, stimulus, alpha=0.05)
+    rate, adapt = adaptation(time, stimulus, alpha=0.05)
     frate = isi_lowpass(time, rate)
     axf.plot(tfac*time, rate)
     axf.plot(tfac*time, frate)
@@ -136,11 +134,46 @@ def plot_step(axf, axa):
     axa.set_ylabel('Adaptation')
 
 
+def plot_ficurves(ax):
+    """ Plot f-I curves of sigmoidal repsonse function.
+    """
+    dt = 0.0001               # integration time step in seconds
+    time = np.arange(-0.05, 0.5, dt)
+    inputs = np.arange(-2, 6.1, 0.1)
+    stimulus = np.zeros(len(time))
+    f0 = []
+    fs = []
+    for s in inputs:
+        stimulus[time>0.0] = s
+        rate, _ = adaptation(time, stimulus, alpha=0.05)
+        f0.append(np.max(rate))
+        fs.append(rate[-1])
+    time = np.arange(-0.05, 0.1, dt)
+    stimulus = np.zeros(len(time)) + 2.0
+    fa = []
+    for s in inputs:
+        stimulus[time>0.0] = s
+        rate, _ = adaptation(time, stimulus, alpha=0.05)
+        fb = np.mean(rate[(time>-0.05)&(time<0.0)])
+        arate = rate[(time>0.0) & (time<0.1)]
+        inx = np.argmax(np.abs(arate-fb))
+        fa.append(arate[inx])
+    ax.plot(inputs, fs, c='r', label=r'$f_{\infty}(I)$')
+    ax.plot(inputs, f0, c='g', label=r'$f_0(I)$')
+    ax.plot(inputs, fa, c='b', label=r'$f_{a}(I)$')
+    ax.set_ylim(0, 200)
+    ax.set_ylabel('Spike frequency [Hz]')
+    ax.set_xlabel('Stimulus')
+    ax.legend(loc='upper left')
+
+
 def sfa_demo():
     """ Demo of the spike-frequency adaptation model and the functions in this module.
     """
-    fig, axs = plt.subplots(2, 2, constrained_layout=True)
-    plot_step(axs[0,0], axs[1,0])
+    plt.rcParams['axes.xmargin'] = 0.0
+    fig, axs = plt.subplots(3, 1, constrained_layout=True)
+    plot_step(axs[0], axs[1])
+    plot_ficurves(axs[2])
     plt.show()
 
         

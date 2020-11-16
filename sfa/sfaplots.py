@@ -8,7 +8,7 @@ from plotstyle import figwidth, colors, lighter
 
 
 def plot_sigmoid():
-    fig, axs = plt.subplots(1, 3, figsize=(figwidth, 0.4*figwidth), sharey=True)
+    fig, axs = plt.subplots(1, 3, figsize=(1.5*figwidth, 0.4*figwidth), sharey=True)
     slope = 1.0
     I0 = 0.0
     fmax = 200.0
@@ -51,7 +51,7 @@ def plot_stepresponse():
     time = np.arange(-0.05, 0.3+dt, dt)
     stimulus = np.zeros(len(time)) + 1.0
     stimulus[(time > 0.0) & (time < 0.1)] = 3.0
-    rate, adapt = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+    rate, adapt = sfa.adaptation(time, stimulus, alpha=0.05)
     fig, (axf, axa) = plt.subplots(2, 1, figsize=(figwidth, 0.6*figwidth), sharex=True)
     axf.plot(tfac*time, rate, color=colors['blue'], zorder=10, clip_on=False)
     axf.set_ylabel('Spike frequency [Hz]')
@@ -71,7 +71,7 @@ def plot_isi_lowpass():
     time = np.arange(-0.05, 0.3+dt, dt)
     stimulus = np.zeros(len(time)) + 1.0
     stimulus[(time > 0.0) & (time < 0.1)] = 3.0
-    rate, adapt = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+    rate, adapt = sfa.adaptation(time, stimulus, alpha=0.05)
     frate = sfa.isi_lowpass(time, rate)
     fig, ax = plt.subplots(figsize=(figwidth, 0.4*figwidth))
     ax.plot(tfac*time, rate, label=r'$f_0(I-A)$', zorder=10, clip_on=False)
@@ -84,7 +84,7 @@ def plot_isi_lowpass():
         
 
 def plot_ficurves():
-    """ Plot f-I curves
+    """ Plot f-I curves of sigmoidal repsonse function.
     """
     dt = 0.0001               # integration time step in seconds
     time = np.arange(-0.05, 0.5, dt)
@@ -94,7 +94,7 @@ def plot_ficurves():
     fs = []
     for s in inputs:
         stimulus[time>0.0] = s
-        rate, _ = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+        rate, _ = sfa.adaptation(time, stimulus, alpha=0.05)
         f0.append(np.max(rate))
         fs.append(rate[-1])
     time = np.arange(-0.05, 0.1, dt)
@@ -102,7 +102,7 @@ def plot_ficurves():
     fa = []
     for s in inputs:
         stimulus[time>0.0] = s
-        rate, _ = sfa.adaptation_sigmoid(time, stimulus, alpha=0.05)
+        rate, _ = sfa.adaptation(time, stimulus, alpha=0.05)
         fb = np.mean(rate[(time>-0.05)&(time<0.0)])
         arate = rate[(time>0.0) & (time<0.1)]
         inx = np.argmax(np.abs(arate-fb))
