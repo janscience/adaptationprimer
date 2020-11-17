@@ -48,6 +48,14 @@ frequency. Modeling adaptation on the level of spike freuqencies is
 thus a natural choice. [Read more.](sfa/README.md)
 
 
+## Adaptation high-pass filter
+
+Spike-frequency adaptation basically adds a high-pass filter to the
+neuron's input-output function. This filter operation interacts with
+the non-linear *f-I* curves of the neuron. [Read
+more.](filter/README.md)
+
+
 ## Contributing
 
 You are welcome to improve the code and the explanations. Or even add

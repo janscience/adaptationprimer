@@ -225,3 +225,7 @@ frate = isi_lowpass(time, rate)
 > Ermentrout B (1998) Linearization of f-I curves by adaptation. *Neural Comput* 10: 1721-1729.
 
 > Knight, BW (1972) Dynamics of encoding in a population of neurons. *J Gen Physiol* 59: 734-766.
+
+## Next
+
+Continue reading about [adaptation high-pass filter](../filter/README.md).
