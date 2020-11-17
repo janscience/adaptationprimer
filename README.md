@@ -1,5 +1,29 @@
 # Neural Adaptation Primer
 
+This repository provides a tutorial on how to model neural
+adaptation. It complements the primer on "Neural adaptation" by Jan
+Benda published in Current Biology. Feel free to use and distribute
+the scripts and figures for teaching. The code, figures, and
+descriptions are provided under the [GNU General Public License
+v3.0](LICENSE).
+
+For each of the topic listed below, there is a folder 'TOPIC/' that
+contains a 'README.md' file, a python script 'TOPIC.py' containing the
+functions explained in the README.md file that you can run for a demo,
+a python script 'TOPICplots.py' that uses the functions in 'TOPIC.py'
+to generate the figures in the 'README.md' file, and these figures as
+'TOPIC-*.png' files.
+
+For running the demo script, change into the directory of the topic,
+and run the script. For example, to run the demo for the adapting
+leaky integrate-and-fire model in 'lifac/' do:
+```
+cd lifac
+python3 lifac.py
+```
+Or simply open the 'lifac/lifac.py' script in your IDE and run it from
+there.
+
 
 ## Requirements
 
