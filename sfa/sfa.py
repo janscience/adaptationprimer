@@ -42,8 +42,7 @@ def adaptation(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, fmax=200.
     taua: float
         Adaptation time constant, same unit as `time`.
     alpha: float
-        Adaptation strength. At each spike the adaptation variable is incremented by
-        `alpha` divided by `taua`.
+        Adaptation strength.
     slope: float
         Slope of the sigmoidal f-I curve.
     I0: float

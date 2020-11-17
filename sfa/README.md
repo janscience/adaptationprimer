@@ -154,7 +154,9 @@ for s in inputs:
 Note the linearizing effect of adaptation on the steady-state *f-I* curve
 (Ermentrout, 1998).
 
-> Compute *f-I* curves for various values of the
+> Compute adapted *f-I* curves for various values of the preadaptation stimulus.
+
+> How do the three types of *f-I* curves change their shape if you vary
 > - adaptation strength
 > - adaptation time constant
 
