@@ -1,12 +1,12 @@
 # Leaky integrate-and-fire with adaptation current
 
-Run
+Change into the `lifac/` directory and run
 ``` sh
 python3 lifac.py
 ```
 for a demo.
 
-In the following key concepts of the model and the respective code are
+In the following, key concepts of the model and the respective code are
 briefly described. See the `lifac.py` script for the full functions.
 
 

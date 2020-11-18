@@ -1,12 +1,12 @@
 # Spike-frequency adaptation models
 
-Run
+Change into the `sfa/` directory and run
 ``` sh
 python3 sfa.py
 ```
 for a demo.
 
-In the following key concepts of the model and the respective code are
+In the following, key concepts of the model and the respective code are
 briefly described. See the `sfa.py` script for the full functions.
 
 

@@ -38,14 +38,15 @@ The `python` scripts run in python version 3, using the following packages:
 
 The leaky integrate-and-fire model is a simple model of a spiking
 neuron. Augmented with a generic adaptation current it reproduces many
-features of intrinsically adapting neurons. [Read more.](lifac/README.md)
+features of intrinsically adapting neurons. [Read more in
+`lifac/`.](lifac/README.md)
 
 
 ## Spike-frequency adaptation models
 
 Spike-frequency adaptation is a phenomenon of the spike
 frequency. Modeling adaptation on the level of spike freuqencies is
-thus a natural choice. [Read more.](sfa/README.md)
+thus a natural choice. [Read more in `sfa/`.](sfa/README.md)
 
 
 ## Adaptation high-pass filter
@@ -53,7 +54,7 @@ thus a natural choice. [Read more.](sfa/README.md)
 Spike-frequency adaptation basically adds a high-pass filter to the
 neuron's input-output function. This filter operation interacts with
 the non-linear *f-I* curves of the neuron. [Read
-more.](filter/README.md)
+more in `filter/`.](filter/README.md)
 
 
 ## Contributing
