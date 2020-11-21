@@ -19,7 +19,7 @@ phase shift for each frequency component of a stimulus. For measuring
 the transfer function we need to stimulate the neuron with a stimulus
 that contains many different frequencies. One such stimulus is a
 band-limited Gaussian white noise. In this stimulus all frequencies up
-to a cutoff frequency have the same power. This is why is is called
+to a cutoff frequency have the same power. This is why is called
 "white" noise, because if the frequencies would be light waves in the
 visible spectrum it would appear white. The frequency components are
 independent of each other, they have random phases. The amplitude
@@ -101,7 +101,7 @@ Fourier transformed. The squared Fourier transforms are then averaged
 over the segments.
 
 Luckily, there is a function doing this for us: `welch()` in
-`scipy.signals`. It taked a time series (our stimulus) as an input and
+`scipy.signals`. It takes a time series (our stimulus) as an input and
 returns an array with frequencies and an array with the powers for
 each frequency. We need to provide the sampling rate of our data,
 i.e. the inverse time step, via the `fs` argument to the `welch()`
@@ -250,8 +250,6 @@ by the unit of the stimulus.
 
 > How do the adaptation time constant and the adaptation strength influence the gain?
 
-> How do the adaptation time constant and the adaptation strength influence the phase?
-
 
 The other aspect of the transfer function is the phase:
 ```
@@ -263,7 +261,7 @@ frequency.
 
 ![ratephase](filter-ratephase.png)
 
-The firing rate has positive phase adavances at frequencies around the
+The firing rate has positive phase advances at frequencies around the
 inverse adaptation time constant. Note that for large frequencies
 (right panel) we run into numerical problems. We would need to make
 the integration time step even smaller to get phases at zero.
@@ -271,6 +269,8 @@ the integration time step even smaller to get phases at zero.
 > Vary the integration time step by making it larger or smaller by
 > factors of ten. How does this influence the estimates of the gain
 > and the phase?
+
+> How do the adaptation time constant and the adaptation strength influence the phase?
 
 > Vary the stimulus mean and standard deviation. Do they influence the
 > gain and phase curves?
