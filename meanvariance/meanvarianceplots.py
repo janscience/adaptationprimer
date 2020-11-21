@@ -183,7 +183,7 @@ def plot_amplitudemodulation():
     ax.legend(loc='upper right', bbox_to_anchor=(1.0, 1.2))
     ax = axs[2]
     ax.plot(freqs, 10.0*np.log10(pthresh/np.max(pthresh)), label='thresholded stimulus')
-    ax.plot(freqs, 10.0*np.log10(pam/np.max(pthresh)), label='AM')
+    ax.plot(freqs, 10.0*np.log10(0.5*pam/np.max(pthresh)), label='AM')
     ax.set_xlim(0, 100.0)
     ax.set_ylim(-30, 0)
     ax.yaxis.set_major_locator(ticker.MultipleLocator(10.0))

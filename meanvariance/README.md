@@ -181,7 +181,7 @@ def amplitude_modulation(signal, dt, fcutoff):
     signal = np.array(signal)
     signal[signal<0.0] = 0.0
     sos = sig.butter(2, fcutoff, 'lp', fs=1.0/dt, output='sos')
-    am = 2.0*sig.sosfilt(sos, signal)
+    am = 2.0*sig.sosfilt(sos, signal)    # factor two to make up for thresholding
     return am
 ```
 

@@ -277,7 +277,7 @@ def plot_amplitudemodulation(axs):
     ax.set_ylabel('Power stimulus [dB]')
     ax = axs[2]
     ax.plot(freqs, 10.0*np.log10(pthresh/np.max(pthresh)))
-    ax.plot(freqs, 10.0*np.log10(pam/np.max(pthresh)))
+    ax.plot(freqs, 10.0*np.log10(0.5*pam/np.max(pthresh)))
     ax.set_xlim(0, 100.0)
     ax.set_ylim(-30, 0)
     ax.set_xlabel('Frequency [Hz]')
