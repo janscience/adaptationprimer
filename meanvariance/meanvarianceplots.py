@@ -138,11 +138,64 @@ def plot_variancestimulus():
     ax.legend(loc='upper left')
     fig.savefig('meanvariance-variancethreshold')
     
+
+def plot_amplitudemodulation():
+    dt = 0.001                    # integration time step in seconds
+    tmax = 4.0                    # stimulus duration in seconds
+    cutoffl = 40.0                # lower cutoff frequency of stimulus in Hertz
+    cutoffu = 80.0                # upper cutoff frequency of stimulus in Hertz
+    T = 1.0                       # duration of segements with constant mean in seconds
+    stdevs = [0.5, 1.5, 3.0, 0.5] # standard deviations for each segment
+    #stimulus = 0.5*mv.whitenoise(cutoffl, cutoffu, dt, tmax)
+    #time = np.arange(len(stimulus))*dt
+    time = np.arange(0.0, tmax, dt)
+    stimulus = 0.5*np.sin(2.0*np.pi*cutoffl*time)
+    std = np.zeros(len(stimulus))
+    for k, s in enumerate(stdevs):
+        std[(time>k*T) & (time<=(k+1)*T)] += s
+    stimulus *= std
+    stimulus += 2.0
+    # compute amplitude modulation:
+    stimulus -= np.mean(stimulus)
+    am = mv.amplitude_modulation(stimulus, dt, 2.0)
+    # power spectra:
+    nfft = 2**11
+    freqs, pstim = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
+    stim = np.array(stimulus)
+    stim[stim<0.0] = 0.0
+    freqs, pthresh = sig.welch(stim, fs=1.0/dt, nperseg=nfft)
+    freqs, pam = sig.welch(am, fs=1.0/dt, nperseg=nfft)
+    # plot:
+    fig, axs = plt.subplots(3, 1, figsize=(figwidth, 0.8*figwidth))
+    ax = axs[0]
+    ax.plot(time, stimulus, label='stimulus')
+    ax.plot(time, am, label='AM')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Stimulus')
+    ax.legend(loc='upper right', bbox_to_anchor=(1.0, 1.2))
+    ax = axs[1]
+    ax.plot(freqs, 10.0*np.log10(pstim/np.max(pstim)), label='stimulus')
+    ax.set_xlim(0, 100.0)
+    ax.set_ylim(-30, 0)
+    ax.set_xlabel('Frequency [Hz]')
+    ax.set_ylabel('Power [dB]')
+    ax.legend(loc='upper right', bbox_to_anchor=(1.0, 1.2))
+    ax = axs[2]
+    ax.plot(freqs, 10.0*np.log10(pthresh/np.max(pthresh)), label='thresholded stimulus')
+    ax.plot(freqs, 10.0*np.log10(pam/np.max(pthresh)), label='AM')
+    ax.set_xlim(0, 100.0)
+    ax.set_ylim(-30, 0)
+    ax.set_xlabel('Frequency [Hz]')
+    ax.set_ylabel('Power [dB]')
+    ax.legend(loc='upper right', bbox_to_anchor=(1.0, 1.4))
+    fig.savefig('meanvariance-amplitudemodulation')
+    
         
 if __name__ == "__main__":
     plot_meanstimulus()
     plot_meansine()
     plot_variancestimulus()
+    plot_amplitudemodulation()
 
 
     

@@ -153,13 +153,58 @@ The same neuron from above responds in the following way to this stimulus:
 
 ![variancethreshold](meanvariance-variancethreshold.png)
 
-The adaptation variable somehow tracks the changes in stimulus
-variance.  But because the neuron's *f-I* curve is shifted, the
-response is not invariant to the changes in stimulus variance, peak
-spike frequencies increase with stimulus variance.
+Although the mean of the stimulus is constant, the adaptation variable
+somehow tracks the changes in stimulus variance. This is possible,
+because of the non-linear shapes of the neuron's *f-I* curves
+(sigmoidal Boltzman functions). They cut out the lower stimulus values
+and that way the resulting spike-frequency does not have a constant
+mean. The mean value of the resulting spike-frequency increases with
+stimulus variance. But because the neuron's *f-I* curve is shifted,
+the response is not invariant to the changes in stimulus variance,
+peak spike frequencies increase with stimulus variance.
 
 
-## Computing the amplitude modulation
+## Extracting the amplitude modulation
+
+How to extract the current variance of the stimulus? The (square root
+of the) variance of the stimulus is also known as its amplitude
+modulation. A common method to extract the amplitude modulation is to
+first threshold the (mean-free) signal at zero, i.e. set all negative
+values of the stimulus to zero. This makes the stimulus asymmetric and
+the amplitude modulation appears as low-frequency components in its
+power spectrum. One then can filter the thresholded stimulus to
+isolate this low-frequency information and this way retrieve the
+amplitude modulation.
+
+``` py
+def amplitude_modulation(signal, dt, fcutoff):
+    signal = np.array(signal)
+    signal[signal<0.0] = 0.0
+    sos = sig.butter(2, fcutoff, 'lp', fs=1.0/dt, output='sos')
+    am = 2.0*sig.sosfilt(sos, signal)
+    return am
+```
+
+This is best illustrated with a sine wave as a carrier that is then
+modulated in its amplitude in the same way as the white noise stimulus from above.
+``` py
+fstim = 40.0
+time = np.arange(0.0, tmax, dt)
+stimulus = 0.5*np.sin(2.0*np.pi*fstim*time)
+```
+We then compute the amplitude modulation with a low-pass filter at 2Hz:
+``` py
+am = amplitude_modulation(stimulus, dt, 2.0)
+ax.plot(time, stimulus)
+ax.plot(time, am)
+```
+
+![amplitudemodulation](meanvariance-amplitudemodulation.png)
+
+The stimulus has a peak at the carrier frequency of 40Hz. This peak is
+broadened by the amplitude modulation. Thresholding this signal results in
+harmonics of the carrier frequency, but also in a peak at zero frequency.
+This low-frequency component is the amplitude modulation.
 
 
 ## Adaptation to the variance

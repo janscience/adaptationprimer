@@ -128,6 +128,32 @@ def whitenoise(cflow, cfup, dt, duration, rng=np.random):
     return noise
 
 
+def amplitude_modulation(signal, dt, fcutoff):
+    """ Extract amplitude modulation.
+
+    The signal is first threshoded at zero and then low-pass filtered.
+
+    Parameters
+    ----------
+    signal: 1D array
+        The signal, a carrier with an amplitude modulation.
+    dt: float
+        Time step of the signal.
+    fcutoff: float
+        Cutoff frequency for low-pass filter.
+
+    Returns
+    -------
+    am: 1D array
+        Amplitude modulation of the signal.
+    """
+    signal = np.array(signal)
+    signal[signal<0.0] = 0.0
+    sos = sig.butter(2, fcutoff, 'lp', fs=1.0/dt, output='sos')
+    am = 2.0*sig.sosfilt(sos, signal)
+    return am
+
+
 def plot_meanstimulus(axs, axr):
     dt = 0.001                    # integration time step in seconds
     tmax = 4.0                    # stimulus duration in seconds
@@ -161,7 +187,7 @@ def plot_meansine(axs, axr):
     dt = 0.001                    # integration time step in seconds
     tmax = 4.0                    # stimulus duration in seconds
     cutoff = 40.0                 # cutoff frequency of stimulus in Hertz
-    stimulus = 0.5*whitenoise(0.0, cutoff, dt, tmax, rng)
+    stimulus = 0.5*whitenoise(0.0, cutoff, dt, tmax)
     time = np.arange(len(stimulus))*dt
     mean = 3.0*(1.0-np.cos(2.0*np.pi*time/time[-1]))
     stimulus += mean
@@ -212,14 +238,62 @@ def plot_variancestimulus(axs, axr):
     axr.legend(loc='upper left')
     
 
+def plot_amplitudemodulation(axs):
+    dt = 0.001                    # integration time step in seconds
+    tmax = 4.0                    # stimulus duration in seconds
+    cutoffl = 40.0                # lower cutoff frequency of stimulus in Hertz
+    cutoffu = 80.0                # upper cutoff frequency of stimulus in Hertz
+    T = 1.0                       # duration of segements with constant mean in seconds
+    stdevs = [0.5, 1.5, 3.0, 0.5] # standard deviations for each segment
+    #stimulus = 0.5*whitenoise(cutoffl, cutoffu, dt, tmax)
+    #time = np.arange(len(stimulus))*dt
+    time = np.arange(0.0, tmax, dt)
+    stimulus = 0.5*np.sin(2.0*np.pi*cutoffl*time)
+    std = np.zeros(len(stimulus))
+    for k, s in enumerate(stdevs):
+        std[(time>k*T) & (time<=(k+1)*T)] += s
+    stimulus *= std
+    stimulus += 2.0
+    # compute amplitude modulation:
+    stimulus -= np.mean(stimulus)
+    am = amplitude_modulation(stimulus, dt, 2.0)
+    # power spectra:
+    freqs, pstim = sig.welch(stimulus, fs=1.0/dt, nperseg=2**11)
+    stim = np.array(stimulus)
+    stim[stim<0.0] = 0.0
+    freqs, pthresh = sig.welch(stim, fs=1.0/dt, nperseg=2**11)
+    freqs, pam = sig.welch(am, fs=1.0/dt, nperseg=2**11)
+    # plot:
+    ax = axs[0]
+    ax.plot(time, stimulus, label='stimulus')
+    ax.plot(time, am, label='AM')
+    ax.set_ylabel('Stimulus')
+    ax.legend(loc='upper left')
+    ax = axs[1]
+    ax.plot(freqs, 10.0*np.log10(pstim/np.max(pstim)))
+    ax.set_xlim(0, 100.0)
+    ax.set_ylim(-30, 0)
+    ax.set_xlabel('Frequency [Hz]')
+    ax.set_ylabel('Power stimulus [dB]')
+    ax = axs[2]
+    ax.plot(freqs, 10.0*np.log10(pthresh/np.max(pthresh)))
+    ax.plot(freqs, 10.0*np.log10(pam/np.max(pthresh)))
+    ax.set_xlim(0, 100.0)
+    ax.set_ylim(-30, 0)
+    ax.set_xlabel('Frequency [Hz]')
+    ax.set_ylabel('Power thresh. stimulus [dB]')
+    
+
 def meanvariance_demo():
     """ Demo of adaptation to the mean and variance of a stimulus.
     """
     plt.rcParams['axes.xmargin'] = 0.0
-    fig, axs = plt.subplots(4, 2, constrained_layout=True)
+    fig, axs = plt.subplots(2, 3, constrained_layout=True)
     plot_meanstimulus(axs[0,0], axs[1,0])
     plot_meansine(axs[0,1], axs[1,1])
-    plot_variancestimulus(axs[2,0], axs[3,0])
+    plot_variancestimulus(axs[0,2], axs[1,2])
+    fig, axs = plt.subplots(3, 1, constrained_layout=True)
+    plot_amplitudemodulation(axs)
     plt.show()
 
         
