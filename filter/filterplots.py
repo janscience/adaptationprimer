@@ -97,10 +97,10 @@ def plot_rate_psd():
 def plot_ratetransfer():
     """ Plot transfer fucntion for spike frequency.
     """
-    dt = 0.0001               # integration time step in seconds
-    tmax = 500.0              # stimulus duration
+    dt = 0.00001              # integration time step in seconds
+    tmax = 200.0              # stimulus duration
     cutoff = 1010.0           # highest frequency in stimulus
-    nfft = 2**14              # number of samples for Fourier trafo
+    nfft = 2**16              # number of samples for Fourier trafo
     stimulus = 5.0 + 2.5*filter.whitenoise(0.0, cutoff, dt, tmax)
     time = np.arange(len(stimulus))*dt
     rate, adapt = filter.adaptation(time, stimulus, alpha=0.05, taua=0.02)
@@ -111,9 +111,10 @@ def plot_ratetransfer():
     # gain is only meaningful up to cutoff frequency:
     transfer = transfer[freqs<cutoff]
     freqs = freqs[freqs<cutoff]
-    # gain:
+    # gain and phase:
     gain = np.abs(transfer)
-    # plots:
+    phase = np.angle(transfer)
+    # gain plots:
     fig, axs = plt.subplots(1, 2, figsize=(figwidth, 0.4*figwidth))
     ax = axs[0]
     ax.plot(freqs, gain, color=colors['orange'])
@@ -129,6 +130,26 @@ def plot_ratetransfer():
     ax.set_ylim(10, 40)
     ax.set_xlabel('Frequency [Hz]')
     fig.savefig('filter-rategain')
+    # phase plots:
+    fig, axs = plt.subplots(1, 2, figsize=(figwidth, 0.4*figwidth))
+    ax = axs[0]
+    ax.axhline(0.0, linestyle=':', color=colors['gray'], lw=0.5)
+    ax.plot(freqs, phase, color=colors['red'])
+    ax.set_xlabel('Frequency [Hz]')
+    ax.set_ylabel('Phase')
+    ax.set_xlim(0, 200)
+    ax.set_ylim(-0.25*np.pi, 0.25*np.pi)
+    ax.set_yticks([-0.25*np.pi, 0.0, 0.25*np.pi])
+    ax.set_yticklabels([r'$-\pi/4$', r'$0$', r'$\pi/4$'])
+    ax = axs[1]
+    ax.axhline(0.0, linestyle=':', color=colors['gray'], lw=0.5)
+    ax.plot(freqs, phase, color=colors['red'])
+    ax.set_xscale('log')
+    ax.set_ylim(-0.25*np.pi, 0.25*np.pi)
+    ax.set_yticks([-0.25*np.pi, 0.0, 0.25*np.pi])
+    ax.set_yticklabels([r'$-\pi/4$', r'$0$', r'$\pi/4$'])
+    ax.set_xlabel('Frequency [Hz]')
+    fig.savefig('filter-ratephase')
 
 
 def plot_transfer(axf, axfl, axa, axal):

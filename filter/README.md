@@ -230,9 +230,10 @@ ax.plot(freqs, gain)
 
 This figure was computed with the following parameters:
 ```
-tmax = 500.0
-cutoff = 1000.0
-nfft = 2**14
+dt = 0.00001
+tmax = 200.0
+cutoff = 1010.0
+nfft = 2**16
 ```
 The right panel is a double logarithmic plot of the same gain values
 shown in the left panel. The first-order high-pass filter of
@@ -249,5 +250,27 @@ by the unit of the stimulus.
 
 > How do the adaptation time constant and the adaptation strength influence the gain?
 
+> How do the adaptation time constant and the adaptation strength influence the phase?
+
+
+The other aspect of the transfer function is the phase:
+```
+phase = np.angle(transfer)
+```
+It is the phase in radians (between -&#960; and +&#960;) describing
+how the response is shifted in time relative to the stimulus at each
+frequency.
+
+![ratephase](filter-ratephase.png)
+
+The firing rate has positive phase adavances at frequencies around the
+inverse adaptation time constant. Note that for large frequencies
+(right panel) we run into numerical problems. We would need to make
+the integration time step even smaller to get phases at zero.
+
+> Vary the integration time step by making it larger or smaller by
+> factors of ten. How does this influence the estimates of the gain
+> and the phase?
+
 > Vary the stimulus mean and standard deviation. Do they influence the
-> gain?
+> gain and phase curves?
