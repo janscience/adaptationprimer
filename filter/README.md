@@ -143,7 +143,7 @@ freqs, psd = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
 ax.plot(freqs, psd)
 ```
 
-![stimulus](filter-psd.png)
+![psd](filter-psd.png)
 
 Very often the power is plotted on a logarithmic scale by transforming
 the power values decibel relative to the maximum power or some other
@@ -175,7 +175,7 @@ rate, adapt = adaptation(time, stimulus, alpha=0.05, taua=0.02)
 freqs, psd = sig.welch(rate, fs=1.0/dt, nperseg=nfft)
 ```
 
-![stimulus](filter-ratepsd.png)
+![ratepsd](filter-ratepsd.png)
 
 These spectra differ in two respects from the stimulus spectra. First,
 we see the high-pass filter effect of adaptation. Low frequency
