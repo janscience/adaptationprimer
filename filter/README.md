@@ -6,24 +6,25 @@ python3 filter.py
 ```
 for a demo.
 
-In the following, key concepts of the model and the respective code
-are briefly described. See the [`filter.py`](filter.py) script for the
-full functions.
+In the following, key concepts of power spectra, cross spectra and
+transfer functions as well as the respective code are briefly
+described. See the [`filter.py`](filter.py) script for the full
+functions.
 
 
 ## White noise stimulus
 
-The transfer function of a neuron characterizes its linear
-input-output relation between stimulus and response by a gain and a
-phase shift for each frequency component of a stimulus. For measuring
-the transfer function we need to stimulate the neuron with a stimulus
-that contains many different frequencies. One such stimulus is a
-band-limited Gaussian white noise. In this stimulus all frequencies up
-to a cutoff frequency have the same power. This is why is called
-"white" noise, because if the frequencies would be light waves in the
-visible spectrum it would appear white. The frequency components are
-independent of each other, they have random phases. The amplitude
-distribution of such a stimulus is Gaussian.
+The transfer function of a neuron (actually of any system)
+characterizes its linear input-output relation between stimulus and
+response by a gain and a phase shift for each frequency component of a
+stimulus. For measuring the transfer function we need to stimulate the
+neuron with a stimulus that contains many different frequencies. One
+such stimulus is a band-limited Gaussian white noise. In this stimulus
+all frequencies up to a cutoff frequency have the same power. This is
+why is called "white" noise, because if the frequencies would be light
+waves in the visible spectrum, the light would appear white. The
+frequency components are independent of each other, they have random
+phases. The amplitude distribution of such a stimulus is Gaussian.
 
 To generate a white noise, we draw for each frequency above a lower
 cutoff frequency `cflow` and an upper cutoff frequency `cfup` a random
@@ -63,10 +64,10 @@ def whitenoise(cflow, cfup, dt, duration, rng=np.random):
 
 ![whitenoise](filter-whitenoise.png)
 
-The returned noise stimulus has an average of zero (dashed line) and a
-unit standard deviation (dotted lines).  By multiplying the noise with
-a number one can modify the standard deviation. Adding a number
-modifies the mean of the noise:
+The returned noise stimulus has zero mean (dashed line) and unit
+standard deviation (dotted lines).  By multiplying the noise with a
+number one can modify the standard deviation. Adding a number modifies
+the mean of the noise:
 
 ``` py
 dt = 0.001              # integration time step in seconds
@@ -96,7 +97,7 @@ The power spectrum of the stimulus tells us the power, i.e. the
 squared amplitude, of each frequency component of the stimulus.  For
 estimating the power spectrum the stimulus is chopped in a number of
 segments each containing `nfft` elements. Each segment is first
-multiplied with a window function to reduced edge effects and the
+multiplied with a window function to reduced edge effects and then
 Fourier transformed. The squared Fourier transforms are then averaged
 over the segments.
 
@@ -128,7 +129,7 @@ the sampling rate must be at least twice as fast. At least two samples
 per period of the sine wave are needed for a proper estimate of its
 frequency.
 
-Note also that the returned power values are a power spectra
+Note also that the returned power values are a power spectral
 *density*.  They have the unit `x**2/Hz`, with `x` being the unit of
 the data values and `Hz` is the frequency unit of the supplied `fs`
 parameter.
@@ -209,9 +210,9 @@ transfer = csd/psd
 
 Since we divide by the stimulus power spectrum, and since by
 construction of the white noise stimulus there is no stimulus
-component at frequencies higher than the cut-off frequency (division
-by zero!), the transfer function at frequencies beyond the cut-off
-frequency of the stimulus is not meaningful. We therefore only keep
+component at frequencies higher than the cut-off frequency, the
+transfer function at frequencies beyond the cut-off frequency of the
+stimulus is not meaningful (division by zero!). We therefore only keep
 values below the cutoff frequency:
 
 ``` py
@@ -269,10 +270,24 @@ inverse adaptation time constant. Note that for large frequencies
 (right panel) we run into numerical problems. We would need to make
 the integration time step even smaller to get phases at zero.
 
-With the same techniques we can compute the transfer function between
-the stimulus and the adaptation variable, which is a low-pass filter
-(Benda and Herz, 2005). We can just use the `transfer()` function
-provided in the `filter.py` script
+The transfer function (the gain and phase curves together) completely
+characterizes a linear system. Any arbitrary stimulus can be Fourier
+transformed, multiplied with the transfer function, and transformed
+back into time domain to correctly predict the response of the linear
+system. By measuring the transfer function once, as decribed above,
+everything is know about the linear system.
+
+Non-linear system, however, do not have a unique transfer
+function. For non-linear systems the transfer function depends on the
+stimulus parameters, i.e. its mean, standard deviation and also the
+frequency content. Each stimulus might result in different transfer
+functions. For a linear system, the transfer function does not depend
+on stimulus parameter.
+
+We can also compute the transfer function between the stimulus and the
+adaptation variable, which is a low-pass filter (Benda and Herz,
+2005). We can just use the `transfer()` function provided in the
+`filter.py` script
 ``` py
 freqs, gain, phase = transfer(stimulus, adapt, dt, nfft, cutoff)
 ```
