@@ -128,20 +128,31 @@ def whitenoise(cflow, cfup, dt, duration, rng=np.random):
     return noise
 
 
-def plot_meanstimulus(ax):
-    dt = 0.001              # integration time step in seconds
-    tmax = 4.0              # stimulus duration in seconds
-    cutoff = 50.0           # cutoff frequency of stimulus in Hertz
+def plot_meanstimulus(axs, axr):
+    dt = 0.001                    # integration time step in seconds
+    tmax = 4.0                    # stimulus duration in seconds
+    cutoff = 20.0                 # cutoff frequency of stimulus in Hertz
+    T = 1.0                       # duration of segements with constant mean in seconds
+    means = [0.0, 3.0, 6.0, 1.5]  # mean stimulus values for each segment
     stimulus = 0.5*whitenoise(0.0, cutoff, dt, tmax)
     time = np.arange(len(stimulus))*dt
     mean = np.zeros(len(stimulus))
-    mean[(time>1.0) & (time<=2.0)] += 3.0
-    mean[(time>2.0) & (time<=3.0)] += 6.0
-    mean[(time>3.0) & (time<=4.0)] += 1.5
+    for k, m in enumerate(means):
+        mean[(time>k*T) & (time<=(k+1)*T)] += m
     stimulus += mean
-    ax.plot(time, stimulus)
-    ax.set_xlabel('Time [s]')
-    ax.set_ylabel('Stimulus')
+    # response of non adapting neuron:
+    rate0, _ = adaptation(time, stimulus, alpha=0.0, taua=0.5)
+    # response of adapting neuron:
+    rate, _ = adaptation(time, stimulus, alpha=0.2, taua=0.5)
+    # plot:
+    axs.plot(time, stimulus)
+    axs.set_xlabel('Time [s]')
+    axs.set_ylabel('Stimulus')
+    axr.plot(time, rate0, label='non adapting')
+    axr.plot(time, rate, label='adapting')
+    axr.set_xlabel('Time [s]')
+    axr.set_ylabel('Spike frequency [Hz]')
+    axr.legend(loc='upper left')
     
 
 def meanvariance_demo():
@@ -149,7 +160,7 @@ def meanvariance_demo():
     """
     plt.rcParams['axes.xmargin'] = 0.0
     fig, axs = plt.subplots(2, 2, constrained_layout=True)
-    plot_meanstimulus(axs[0,0])
+    plot_meanstimulus(axs[0,0], axs[1,0])
     plt.show()
 
         
