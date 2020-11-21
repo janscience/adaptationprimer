@@ -76,7 +76,7 @@ def plot_rate_psd():
     mean = 5.0              # stimulus mean
     stdev = 2.5             # stimulus standard deviation
     nfft = 2**10            # nfft for power spectrum estimate
-    rng = np.random.RandomState(981)
+    rng = np.random.RandomState(781)
     stimulus = mean + stdev*filter.whitenoise(0.0, cutoff, dt, tmax, rng)
     time = np.arange(len(stimulus))*dt
     rate, adapt = filter.adaptation(time, stimulus, alpha=0.05, taua=0.02)
@@ -86,6 +86,7 @@ def plot_rate_psd():
     ax.plot(freqs, psd)
     ax.set_xlabel('Frequency [Hz]')
     ax.set_ylabel('Power')
+    ax.set_ylim(0, 40)
     ax = axs[1]
     ax.plot(freqs, 10.0*np.log10(psd/np.max(psd)))
     ax.set_ylim(-20, 0)
@@ -104,16 +105,7 @@ def plot_ratetransfer():
     stimulus = 5.0 + 2.5*filter.whitenoise(0.0, cutoff, dt, tmax)
     time = np.arange(len(stimulus))*dt
     rate, adapt = filter.adaptation(time, stimulus, alpha=0.05, taua=0.02)
-    # gain stimulus - rate:
-    freqs, csd = sig.csd(stimulus, rate, fs=1.0/dt, nperseg=nfft)
-    freqs, psd = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
-    transfer = csd/psd
-    # gain is only meaningful up to cutoff frequency:
-    transfer = transfer[freqs<cutoff]
-    freqs = freqs[freqs<cutoff]
-    # gain and phase:
-    gain = np.abs(transfer)
-    phase = np.angle(transfer)
+    freqs, gain, phase = filter.transfer(stimulus, rate, dt, nfft, cutoff)
     # gain plots:
     fig, axs = plt.subplots(1, 2, figsize=(figwidth, 0.4*figwidth))
     ax = axs[0]
@@ -150,50 +142,41 @@ def plot_ratetransfer():
     ax.set_yticklabels([r'$-\pi/4$', r'$0$', r'$\pi/4$'])
     ax.set_xlabel('Frequency [Hz]')
     fig.savefig('filter-ratephase')
-
-
-def plot_transfer(axf, axfl, axa, axal):
-    """ Plot transfer fucntion for spike frequency and adaptation level.
-    """
-    dt = 0.0001               # integration time step in seconds
-    tmax = 100.0              # stimulus duration
-    cutoff = 1010.0           # highest frequency in stimulus
-    nfft = 2**12              # number of samples for Fourier trafo
-    stimulus = 6.0 + 2.0*filter.whitenoise(0.0, cutoff, dt, tmax)
-    time = np.arange(len(stimulus))*dt
-    rate, adapt = filter.adaptation(time, stimulus, alpha=0.05, taua=0.02)
-    frate = filter.isi_lowpass(time, rate)
-    # transfer function stimulus - rate:
-    freqs, csd = sig.csd(stimulus, rate, fs=1.0/dt, nperseg=nfft)
-    freqs, psd = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
-    rtransfer = csd/psd
-    rgain = np.abs(rtransfer)
-    # transfer function stimulus - spike frequency:
-    freqs, csd = sig.csd(stimulus, frate, fs=1.0/dt, nperseg=nfft)
-    ftransfer = csd/psd
-    fgain = np.abs(ftransfer)
-    # transfer function stimulus - adaptation:
-    freqs, csd = sig.csd(stimulus, adapt, fs=1.0/dt, nperseg=nfft)
-    atransfer = csd/psd
-    again = np.abs(atransfer)
-    # gain is only meaningful up to cutoff frequency:
-    axf.plot(freqs[freqs<cutoff], rgain[freqs<cutoff], label=r'$f(t)$')
-    axf.plot(freqs[freqs<cutoff], fgain[freqs<cutoff], label=r'$\langle f(t) \rangle $')
-    axf.set_ylabel('Rate gain')
-    axf.legend()
-    axfl.plot(freqs[freqs<cutoff], rgain[freqs<cutoff])
-    axfl.plot(freqs[freqs<cutoff], fgain[freqs<cutoff])
-    axfl.set_xscale('log')
-    axfl.set_yscale('log')
-    axfl.set_ylim(1e0, 1e2)
-    axa.plot(freqs[freqs<cutoff], again[freqs<cutoff])
-    axa.set_xlabel('Frequency [Hz]')
-    axa.set_ylabel('Adaptation gain')
-    axal.plot(freqs[freqs<cutoff], again[freqs<cutoff])
-    axal.set_xscale('log')
-    axal.set_yscale('log')
-    axal.set_ylim(1e-2, 1e0)
-    axal.set_xlabel('Frequency [Hz]')
+    
+    # transfer stimulus - adaptation:
+    freqs, gain, phase = filter.transfer(stimulus, adapt, dt, nfft, cutoff)
+    fig, axs = plt.subplots(2, 2, figsize=(figwidth, 0.5*figwidth))
+    ax = axs[0,0]
+    ax.plot(freqs, gain, color=colors['red'])
+    ax.set_ylabel('Gain')
+    ax.set_xlim(0, 200)
+    ax.set_ylim(0, 0.8)
+    ax.xaxis.set_major_formatter(ticker.NullFormatter())
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
+    ax = axs[0,1]
+    ax.plot(freqs, gain, color=colors['red'])
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.set_ylim(1e-2, 1e0)
+    ax.xaxis.set_major_formatter(ticker.NullFormatter())
+    ax = axs[1,0]
+    ax.axhline(0.0, linestyle=':', color=colors['gray'], lw=0.5)
+    ax.plot(freqs, phase, color=colors['red'])
+    ax.set_xlabel('Frequency [Hz]')
+    ax.set_ylabel('Phase')
+    ax.set_xlim(0, 200)
+    ax.set_ylim(-0.5*np.pi, 0.0)
+    ax.set_yticks([0.0, -0.25*np.pi, -0.5*np.pi])
+    ax.set_yticklabels([r'$0$', r'$-\pi/4$', r'$-\pi/2$'])
+    ax = axs[1,1]
+    ax.axhline(0.0, linestyle=':', color=colors['gray'], lw=0.5)
+    ax.plot(freqs, phase, color=colors['red'])
+    ax.set_xscale('log')
+    ax.set_ylim(-0.5*np.pi, 0.0)
+    ax.set_yticks([0.0, -0.25*np.pi, -0.5*np.pi])
+    ax.set_yticklabels([r'$0$', r'$-\pi/4$', r'$-\pi/2$'])
+    ax.set_xlabel('Frequency [Hz]')
+    fig.savefig('filter-adaptbode')
 
         
 if __name__ == "__main__":

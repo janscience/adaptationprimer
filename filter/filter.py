@@ -166,7 +166,44 @@ def whitenoise(cflow, cfup, dt, duration, rng=np.random):
     # inverse FFT:
     noise = np.real(np.fft.irfft(whitef))[:n]*sigma*nn
     return noise
-	
+
+
+def transfer(stimulus, response, dt, nfft=2**10, maxf=None):
+    """ Transfer function between stimulus and response.
+
+    Parameters
+    ----------
+    stimulus: 1D array
+        Stimulus time series.
+    response: 1D array
+        Response time series corresponding to `stimulus`.
+    dt: float
+        Time step in seconds.
+    nfft: int
+        Number of samples used for Fourier transformation. Ideally a power of two.
+    maxf: float or None
+        If not `None`, truncate returned arrays at this frequency (in Hertz).
+        This usually is the cutoff frequency of the stimulus used.
+
+    Returns
+    -------
+    freqs: 1D array
+        Frequencies in Hertz.
+    gain: 1D array
+        Gain of the transfer function for each frequency in `freqs`.
+    phase: 1D array
+        Phase of the transfer function in radians for each frequency in `freqs`.
+    """
+    freqs, csd = sig.csd(stimulus, response, fs=1.0/dt, nperseg=nfft)
+    freqs, psd = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
+    transfer = csd/psd
+    if maxf:
+        transfer = transfer[freqs<maxf]
+        freqs = freqs[freqs<maxf]
+    gain = np.abs(transfer)
+    phase = np.angle(transfer)
+    return freqs, gain, phase
+
 
 def plot_whitenoise(ax):
     dt = 0.001              # integration time step in seconds

@@ -68,7 +68,7 @@ unit standard deviation (dotted lines).  By multiplying the noise with
 a number one can modify the standard deviation. Adding a number
 modifies the mean of the noise:
 
-```
+``` py
 dt = 0.001              # integration time step in seconds
 tmax = 1.0              # stimulus duration in seconds
 cutoff = 50.0           # highest frequency in stimulus in Hertz
@@ -133,7 +133,7 @@ Note also that the returned power values are a power spectra
 the data values and `Hz` is the frequency unit of the supplied `fs`
 parameter.
 
-```
+``` py
 import scipy.signal as sig
 tmax = 100.0           # more than just a second!
 cutoff = 200.0
@@ -145,12 +145,13 @@ ax.plot(freqs, psd)
 
 ![psd](filter-psd.png)
 
-Very often the power is plotted on a logarithmic scale by transforming
-the power values decibel relative to the maximum power or some other
+The power is usually plotted on a logarithmic scale by transforming
+the power values to decibel relative to the maximum power or some other
 reference power.
 
-```
-dbpsd = 10.0*np.log10(psd/np.max(psd))
+``` py
+pref = np.max(psd)
+dbpsd = 10.0*np.log10(psd/pref)  # decibel relative to pref
 ax.plot(freqs, dbpsd)
 ax.set_ylim(-20, 0)
 ```
@@ -168,7 +169,7 @@ ax.set_ylim(-20, 0)
 In the very same way as for the stimulus we can estimate a power
 spectrum of the neuronal response. Let us simulate the firing rate of
 an adapting neuron and compute its power spectrum:
-```
+``` py
 stimulus = mean + stdev*filter.whitenoise(0.0, cutoff, dt, tmax)
 time = np.arange(len(stimulus))*dt
 rate, adapt = adaptation(time, stimulus, alpha=0.05, taua=0.02)
@@ -200,7 +201,7 @@ transformation of a signal, it multiplies the Fourier transformations
 of two different signals, here the ones of the response and the
 stimulus.
 
-```
+``` py
 freqs, csd = sig.csd(stimulus, rate, fs=1.0/dt, nperseg=nfft)
 freqs, psd = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
 transfer = csd/psd
@@ -213,23 +214,23 @@ by zero!), the transfer function at frequencies beyond the cut-off
 frequency of the stimulus is not meaningful. We therefore only keep
 values below the cutoff frequency:
 
-```
+``` py
 transfer = transfer[freqs<cutoff]
-freqs = freqs[freqs<cutoff]
+freqs = freqs[freqs<cutoff]         # this line last!
 ```
 
 The transfer function is a complex valued function of the
 frequencies. Its magnitude (absolute value) is the *gain*:
 
-```
+``` py
 gain = np.abs(transfer)
 ax.plot(freqs, gain)
 ```
 
 ![rategain](filter-rategain.png)
 
-This figure was computed with the following parameters:
-```
+This and the following figure were computed with the following parameters:
+``` py
 dt = 0.00001
 tmax = 200.0
 cutoff = 1010.0
@@ -252,7 +253,7 @@ by the unit of the stimulus.
 
 
 The other aspect of the transfer function is the phase:
-```
+``` py
 phase = np.angle(transfer)
 ax.plot(freqs, phase)
 ```
@@ -266,6 +267,12 @@ The firing rate has positive phase advances at frequencies around the
 inverse adaptation time constant. Note that for large frequencies
 (right panel) we run into numerical problems. We would need to make
 the integration time step even smaller to get phases at zero.
+
+With the same techniques we can compute the transfer function between
+the stimulus and the adaptation variable.
+
+![adaptbode](filter-adaptbode.png)
+
 
 > Vary the integration time step by making it larger or smaller by
 > factors of ten. How does this influence the estimates of the gain
