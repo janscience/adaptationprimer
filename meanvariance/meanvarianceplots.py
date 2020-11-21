@@ -98,10 +98,51 @@ def plot_meansine():
     ax.legend(loc='upper left')
     fig.savefig('meanvariance-meansine')
     
+
+def plot_variancestimulus():
+    dt = 0.001                    # integration time step in seconds
+    tmax = 4.0                    # stimulus duration in seconds
+    cutoff = 60.0                 # cutoff frequency of stimulus in Hertz
+    T = 1.0                       # duration of segements with constant mean in seconds
+    stdevs = [0.5, 1.5, 3.0, 0.5] # standard deviations for each segment
+    rng = np.random.RandomState(583)
+    stimulus = 0.5*mv.whitenoise(0.0, cutoff, dt, tmax)
+    time = np.arange(len(stimulus))*dt
+    std = np.zeros(len(stimulus))
+    for k, s in enumerate(stdevs):
+        std[(time>k*T) & (time<=(k+1)*T)] += s
+    stimulus *= std
+    stimulus += 2.0
+    # response:
+    rate0, adapt0 = mv.adaptation(time, stimulus, alpha=0.0, taua=0.3)
+    rate, adapt = mv.adaptation(time, stimulus, alpha=0.2, taua=0.3)
+    # plot stimulus and threshold:
+    fig, axs = plt.subplots(2, 1, figsize=(figwidth, 0.6*figwidth))
+    ax = axs[0]
+    ax.plot(time, stimulus, color=colors['green'], label='stimulus')
+    ax.fill_between(time, adapt, -1.5, fc=colors['gray'], alpha=0.75)
+    ax.plot(time, adapt, color=colors['red'], label='threshold')
+    ax.set_ylim(-1.5, 7.5)
+    ax.set_ylabel('Stimulus')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
+    ax.xaxis.set_major_formatter(ticker.NullFormatter())
+    ax.legend(loc='upper left')
+    # plot rate:
+    ax = axs[1]
+    ax.plot(time, rate0, color=colors['cyan'], label='non adapting')
+    ax.plot(time, rate, color=colors['blue'], label='adapting')
+    ax.set_ylim(0.0, 200.0)
+    ax.set_xlabel('Time [s]')
+    ax.set_ylabel('Spike frequency [Hz]')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
+    ax.legend(loc='upper left')
+    fig.savefig('meanvariance-variancethreshold')
+    
         
 if __name__ == "__main__":
     plot_meanstimulus()
     plot_meansine()
+    plot_variancestimulus()
 
 
     

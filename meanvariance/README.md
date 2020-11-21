@@ -12,7 +12,7 @@ as the respective code are briefly described. See the
 [`meanvariance.py`](meanvariance.py) script for the full functions.
 
 
-## Adaptation to the mean
+## Subtractive adaptation to the mean
 
 Let's generate a stimulus with stepwise different mean values. For
 this we create a longer white-noise stimulus and a corresponding
@@ -103,7 +103,7 @@ course of the stimulus above the rheobase with the time course of the
 resulting spike frequency above.
 
 Instead of step-wise constant mean stimulus values we can slowly vary
-the mean, for axample by a cosine function:
+the mean, for example by a cosine function:
 ``` py
 cutoff = 40.0                 # cutoff frequency of white noise in Hertz
 stimulus = 0.5*whitenoise(0.0, cutoff, dt, tmax)
@@ -118,6 +118,45 @@ Adaptation follows this slow change in stimulus amplitude and shifts
 the neuron's *f-I* curve accrodingly to the current stimulus
 amplitudes. This way saturation of the response is prevented and the
 fast stimulus components are faithfully transmitted.
+
+> Repeat the examples and vary
+> - the adaptation time constant
+> - the adaptation strength
+> - the cutoff frequency of the stimulus
+> - the duration of the steps/the frequency of the cosine
+
+
+## Subtractive adaptation to variance of a stimulus
+
+What about stimuli with modulated variance? We can construct such a
+stimulus in similar ways.
+``` py
+dt = 0.001                    # integration time step in seconds
+tmax = 4.0                    # stimulus duration in seconds
+cutoff = 60.0                 # cutoff frequency of stimulus in Hertz
+T = 1.0                       # duration of segements with constant mean in seconds
+stdevs = [0.5, 1.5, 3.0, 0.5] # standard deviations for each segment
+# white noise stimulus:
+stimulus = 0.5*whitenoise(0.0, cutoff, dt, tmax)
+time = np.arange(len(stimulus))*dt
+# array with standard deviations:
+std = np.zeros(len(stimulus))
+for k, s in enumerate(stdevs):
+    std[(time>k*T) & (time<=(k+1)*T)] += s
+# apply standard deviations to white noise stimulus:
+stimulus *= std
+# also add a mean value:
+stimulus += 2.0
+```
+
+The same neuron from above responds in the following way to this stimulus:
+
+![meanthreshold](meanvariance-meanthreshold.png)
+
+The adaptation variable somehow tracks the changes in stimulus
+variance.  But because the neuron's *f-I* curve is shifted, the
+response is not invariant to the changes in stimulus variance, peak
+spike frequencies increase with stimulus variance.
 
 
 ## Computing the amplitude modulation

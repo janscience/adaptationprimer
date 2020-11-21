@@ -145,9 +145,9 @@ def plot_meanstimulus(axs, axr):
     # response of adapting neuron:
     rate, adapt = adaptation(time, stimulus, alpha=0.2, taua=0.5)
     # plot:
+    axs.set_title('Mean steps')
     axs.plot(time, stimulus, label='stimulus')
     axs.plot(time, adapt, label='threshold')
-    axs.set_xlabel('Time [s]')
     axs.set_ylabel('Stimulus')
     axs.legend(loc='upper left')
     axr.plot(time, rate0, label='non adapting')
@@ -161,7 +161,6 @@ def plot_meansine(axs, axr):
     dt = 0.001                    # integration time step in seconds
     tmax = 4.0                    # stimulus duration in seconds
     cutoff = 40.0                 # cutoff frequency of stimulus in Hertz
-    rng = np.random.RandomState(583)
     stimulus = 0.5*whitenoise(0.0, cutoff, dt, tmax, rng)
     time = np.arange(len(stimulus))*dt
     mean = 3.0*(1.0-np.cos(2.0*np.pi*time/time[-1]))
@@ -171,9 +170,39 @@ def plot_meansine(axs, axr):
     # response of adapting neuron:
     rate, adapt = adaptation(time, stimulus, alpha=0.2, taua=0.5)
     # plot:
+    axs.set_title('Slow cosine')
     axs.plot(time, stimulus, label='stimulus')
     axs.plot(time, adapt, label='threshold')
-    axs.set_xlabel('Time [s]')
+    axs.set_ylabel('Stimulus')
+    axs.legend(loc='upper left')
+    axr.plot(time, rate0, label='non adapting')
+    axr.plot(time, rate, label='adapting')
+    axr.set_xlabel('Time [s]')
+    axr.set_ylabel('Spike frequency [Hz]')
+    axr.legend(loc='upper left')
+    
+
+def plot_variancestimulus(axs, axr):
+    dt = 0.001                    # integration time step in seconds
+    tmax = 4.0                    # stimulus duration in seconds
+    cutoff = 60.0                 # cutoff frequency of stimulus in Hertz
+    T = 1.0                       # duration of segements with constant mean in seconds
+    stdevs = [0.5, 1.5, 3.0, 0.5] # standard deviations for each segment
+    stimulus = 0.5*whitenoise(0.0, cutoff, dt, tmax)
+    time = np.arange(len(stimulus))*dt
+    std = np.zeros(len(stimulus))
+    for k, s in enumerate(stdevs):
+        std[(time>k*T) & (time<=(k+1)*T)] += s
+    stimulus *= std
+    stimulus += 2.0
+    # response of non adapting neuron:
+    rate0, adapt0 = adaptation(time, stimulus, alpha=0.0, taua=0.5)
+    # response of adapting neuron:
+    rate, adapt = adaptation(time, stimulus, alpha=0.2, taua=0.5)
+    # plot:
+    axs.set_title('Variance steps')
+    axs.plot(time, stimulus, label='stimulus')
+    axs.plot(time, adapt, label='threshold')
     axs.set_ylabel('Stimulus')
     axs.legend(loc='upper left')
     axr.plot(time, rate0, label='non adapting')
@@ -187,9 +216,10 @@ def meanvariance_demo():
     """ Demo of adaptation to the mean and variance of a stimulus.
     """
     plt.rcParams['axes.xmargin'] = 0.0
-    fig, axs = plt.subplots(2, 2, constrained_layout=True)
+    fig, axs = plt.subplots(4, 2, constrained_layout=True)
     plot_meanstimulus(axs[0,0], axs[1,0])
     plot_meansine(axs[0,1], axs[1,1])
+    plot_variancestimulus(axs[2,0], axs[3,0])
     plt.show()
 
         
