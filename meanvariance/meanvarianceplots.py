@@ -106,7 +106,7 @@ def plot_variancestimulus():
     T = 1.0                       # duration of segements with constant mean in seconds
     stdevs = [0.5, 1.5, 3.0, 0.5] # standard deviations for each segment
     rng = np.random.RandomState(583)
-    stimulus = 0.5*mv.whitenoise(0.0, cutoff, dt, tmax)
+    stimulus = 0.5*mv.whitenoise(0.0, cutoff, dt, tmax, rng)
     time = np.arange(len(stimulus))*dt
     std = np.zeros(len(stimulus))
     for k, s in enumerate(stdevs):
@@ -146,7 +146,8 @@ def plot_amplitudemodulation():
     cutoffu = 80.0                # upper cutoff frequency of stimulus in Hertz
     T = 1.0                       # duration of segements with constant mean in seconds
     stdevs = [0.5, 1.5, 3.0, 0.5] # standard deviations for each segment
-    #stimulus = 0.5*mv.whitenoise(cutoffl, cutoffu, dt, tmax)
+    #rng = np.random.RandomState(583)
+    #stimulus = 0.5*mv.whitenoise(cutoffl, cutoffu, dt, tmax, rng)
     #time = np.arange(len(stimulus))*dt
     time = np.arange(0.0, tmax, dt)
     stimulus = 0.5*np.sin(2.0*np.pi*cutoffl*time)
