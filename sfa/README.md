@@ -98,7 +98,8 @@ axa.plot(1000.0*time, adapt, 'r')
 ![stepresponse](sfa-stepresponse.png)
 
 Note that the effective time constant of adaptation during the step is
-much faster than the one after the step (Benda and Herz, 2003).
+much faster than the one after the step (Benda and Herz, 2003, Benda
+et al., 2005).
 
 > Compute the step response for various values of the
 > - adaptation strength
@@ -218,8 +219,6 @@ frate = isi_lowpass(time, rate)
 ## References
 
 > Benda J, Herz AVM (2003) A universal model for spike-frequency adaptation. *Neural Comput.* 15, 2523-2564.
-
-> Benda J, Hennig RM (2008) Dynamics of intensity invariance in a primary auditory interneuron. *J Comput Neurosci* 24: 113-136.
 
 > Benda J, Longtin A, Maler L (2005) Spike-frequency adaptation separates transient communication signals from background oscillations. *J Neurosci* 25: 2312-2321.
 

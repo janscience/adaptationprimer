@@ -73,7 +73,7 @@ dt = 0.001              # integration time step in seconds
 tmax = 1.0              # stimulus duration in seconds
 cutoff = 50.0           # highest frequency in stimulus in Hertz
 mean = 5.0              # stimulus mean
-stdev = 2.5             # stimulus standard deviation
+stdev = 1.5             # stimulus standard deviation
 stimulus = mean + stdev*whitenoise(0.0, cutoff, dt, tmax)
 ```
 
@@ -238,7 +238,8 @@ nfft = 2**16
 ```
 The right panel is a double logarithmic plot of the same gain values
 shown in the left panel. The first-order high-pass filter of
-adaptation is clearly visible.
+adaptation is clearly visible (Benda and Herz, 2003, Benda et al.,
+2005, Benda et al. 2008).
 
 Imagine a sine-wave stimulus with a certain amplitude. Then the
 response of the neuron is also a sine wave (if it behaves sufficiently
@@ -269,16 +270,55 @@ inverse adaptation time constant. Note that for large frequencies
 the integration time step even smaller to get phases at zero.
 
 With the same techniques we can compute the transfer function between
-the stimulus and the adaptation variable.
+the stimulus and the adaptation variable, which is a low-pass filter
+(Benda and Herz, 2005). We can just use the `transfer()` function
+provided in the `filter.py` script
+``` py
+freqs, gain, phase = transfer(stimulus, adapt, dt, nfft, cutoff)
+```
+and plot the gain and the phase as a function of frequency (Bode plot).
 
 ![adaptbode](filter-adaptbode.png)
 
 
+## Transfer function of spike generator
+
+The actual spike frequency is not the direct output of the adaptation
+model.  Its needs to be low-pass filtered with the ISI duration as
+described in the [previous chapter](../sfa/README.md#spike-generator)
+and as implemented in the `isi_lowpass()` function. This low-pass
+filter multiplies the high-pass filter introduced by the adaptation
+process. It has minima at the average spike frequency (Knight, 1972,
+Benda and Herz, 2005, Benda et al., 2008).
+
+![fratebode](filter-fratebode.png)
+
+Correctly estimating the phase at higher frequencies requires a lot of
+data, i.e. long simulations, with sufficiently small integration time
+steps. In the image shown it was not enough (missing or fluctuating
+phase values).
+
 > Vary the integration time step by making it larger or smaller by
 > factors of ten. How does this influence the estimates of the gain
-> and the phase?
+> and the phase of the firing rates and the adaptation variable?
 
 > How do the adaptation time constant and the adaptation strength influence the phase?
 
 > Vary the stimulus mean and standard deviation. Do they influence the
-> gain and phase curves?
+> gain and phase curves of the firing rate and the adaptation variable?
+
+
+## References
+
+> Benda J, Herz AVM (2003) A universal model for spike-frequency adaptation. *Neural Comput.* 15, 2523-2564.
+
+> Benda J, Longtin A, Maler L (2005) Spike-frequency adaptation separates transient communication signals from background oscillations. *J Neurosci* 25: 2312-2321.
+
+> Benda J, Hennig RM (2008) Dynamics of intensity invariance in a primary auditory interneuron. *J Comput Neurosci* 24: 113-136.
+
+> Knight, BW (1972) Dynamics of encoding in a population of neurons. *J Gen Physiol* 59: 734-766.
+
+
+## Next
+
+Continue reading about [adaptation to the mean and variance](../meanvariance/README.md).

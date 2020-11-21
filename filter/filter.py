@@ -211,13 +211,12 @@ def plot_whitenoise(ax):
     cutoff = 50.0           # highest frequency in stimulus in Hertz
     stimulus = whitenoise(0.0, cutoff, dt, tmax)
     time = np.arange(len(stimulus))*dt
-    print(time[-1])
     ax.plot(time, stimulus)
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('White noise')
     
 
-def plot_stimulus(ax):
+def plot_stimulus1(ax):
     dt = 0.001              # integration time step in seconds
     tmax = 1.0              # stimulus duration in seconds
     cutoff = 50.0           # highest frequency in stimulus in Hertz
@@ -230,7 +229,20 @@ def plot_stimulus(ax):
     ax.set_ylabel('Stimulus')
     
 
-def plot_transfer(axf, axfl, axa, axal):
+def plot_stimulus2(ax):
+    dt = 0.001              # integration time step in seconds
+    tmax = 1.0              # stimulus duration in seconds
+    cutoff = 10.0           # highest frequency in stimulus in Hertz
+    mean = 5.0              # stimulus mean
+    stdev = 2.5             # stimulus standard deviation
+    stimulus = mean + stdev*whitenoise(0.0, cutoff, dt, tmax)
+    time = np.arange(len(stimulus))*dt
+    ax.plot(time, stimulus)
+    ax.set_xlabel('Time [s]')
+    ax.set_ylabel('Stimulus')
+    
+
+def plot_transfer(axf, axfl, axfp, axa, axal, axap):
     """ Plot transfer fucntion for spike frequency and adaptation level.
     """
     dt = 0.0001               # integration time step in seconds
@@ -241,47 +253,48 @@ def plot_transfer(axf, axfl, axa, axal):
     time = np.arange(len(stimulus))*dt
     rate, adapt = adaptation(time, stimulus, alpha=0.05, taua=0.02)
     frate = isi_lowpass(time, rate)
-    # transfer function stimulus - rate:
-    freqs, csd = sig.csd(stimulus, rate, fs=1.0/dt, nperseg=nfft)
-    freqs, psd = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
-    rtransfer = csd/psd
-    rgain = np.abs(rtransfer)
-    # transfer function stimulus - spike frequency:
-    freqs, csd = sig.csd(stimulus, frate, fs=1.0/dt, nperseg=nfft)
-    ftransfer = csd/psd
-    fgain = np.abs(ftransfer)
-    # transfer function stimulus - adaptation:
-    freqs, csd = sig.csd(stimulus, adapt, fs=1.0/dt, nperseg=nfft)
-    atransfer = csd/psd
-    again = np.abs(atransfer)
-    # gain is only meaningful up to cutoff frequency:
-    axf.plot(freqs[freqs<cutoff], rgain[freqs<cutoff], label=r'$f(t)$')
-    axf.plot(freqs[freqs<cutoff], fgain[freqs<cutoff], label=r'$\langle f(t) \rangle $')
+    freqs, rgain, rphase = transfer(stimulus, rate, dt, nfft, cutoff)
+    freqs, fgain, fphase = transfer(stimulus, frate, dt, nfft, cutoff)
+    freqs, again, aphase = transfer(stimulus, adapt, dt, nfft, cutoff)
+    axf.plot(freqs, rgain, label=r'$f(t)$')
+    axf.plot(freqs, fgain, label=r'$\langle f(t) \rangle $')
     axf.set_ylabel('Rate gain')
     axf.legend()
-    axfl.plot(freqs[freqs<cutoff], rgain[freqs<cutoff])
-    axfl.plot(freqs[freqs<cutoff], fgain[freqs<cutoff])
+    axfl.plot(freqs, rgain)
+    axfl.plot(freqs, fgain)
     axfl.set_xscale('log')
     axfl.set_yscale('log')
     axfl.set_ylim(1e0, 1e2)
-    axa.plot(freqs[freqs<cutoff], again[freqs<cutoff])
+    axfp.plot(freqs, rphase)
+    axfp.plot(freqs, fphase)
+    axfp.set_xscale('log')
+    axfp.set_xlim(1, 100)
+    axfp.set_ylim(0, 1)
+    axfp.set_ylabel('Rate phase')
+    axa.plot(freqs, again)
     axa.set_xlabel('Frequency [Hz]')
     axa.set_ylabel('Adaptation gain')
-    axal.plot(freqs[freqs<cutoff], again[freqs<cutoff])
+    axal.plot(freqs, again)
     axal.set_xscale('log')
     axal.set_yscale('log')
     axal.set_ylim(1e-2, 1e0)
     axal.set_xlabel('Frequency [Hz]')
+    axap.plot(freqs, aphase)
+    axap.set_xscale('log')
+    axap.set_xlim(1, 100)
+    axap.set_xlabel('Frequency [Hz]')
+    axap.set_ylabel('Adaptation phase')
 
 
 def filter_demo():
     """ Demo of the filter properties of spike-frequency adaptation.
     """
     plt.rcParams['axes.xmargin'] = 0.0
-    fig, axs = plt.subplots(3, 2, constrained_layout=True)
+    fig, axs = plt.subplots(3, 3, constrained_layout=True)
     plot_whitenoise(axs[0,0])
-    plot_stimulus(axs[0,1])
-    #plot_transfer(axs[1,0], axs[1,1], axs[2,0], axs[2,1])
+    plot_stimulus1(axs[0,1])
+    plot_stimulus2(axs[0,2])
+    plot_transfer(axs[1,0], axs[1,1], axs[1,2], axs[2,0], axs[2,1], axs[2,2])
     plt.show()
 
         
