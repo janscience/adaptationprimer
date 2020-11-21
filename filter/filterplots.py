@@ -19,7 +19,7 @@ def plot_whitenoise():
     ax.axhline(0.0, linestyle='--', color=colors['gray'], lw=0.5)
     ax.axhline(-1.0, linestyle=':', color=colors['gray'], lw=0.5)
     ax.axhline(+1.0, linestyle=':', color=colors['gray'], lw=0.5)
-    ax.plot(time, stimulus)
+    ax.plot(time, stimulus, color=colors['green'])
     ax.set_ylim(-3.5, 3.5)
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('White noise')
@@ -39,7 +39,7 @@ def plot_stimulus():
     ax.axhline(mean, linestyle='--', color=colors['gray'], lw=0.5)
     ax.axhline(mean-stdev, linestyle=':', color=colors['gray'], lw=0.5)
     ax.axhline(mean+stdev, linestyle=':', color=colors['gray'], lw=0.5)
-    ax.plot(time, stimulus)
+    ax.plot(time, stimulus, color=colors['green'])
     ax.set_ylim(-2, 12)
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Stimulus')
@@ -58,11 +58,11 @@ def plot_stimulus_psd():
     freqs, psd = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
     fig, axs = plt.subplots(1, 2, figsize=(figwidth, 0.4*figwidth))
     ax = axs[0]
-    ax.plot(freqs, psd)
+    ax.plot(freqs, psd, color=colors['green'])
     ax.set_xlabel('Frequency [Hz]')
     ax.set_ylabel('Power')
     ax = axs[1]
-    ax.plot(freqs, 10.0*np.log10(psd/np.max(psd)))
+    ax.plot(freqs, 10.0*np.log10(psd/np.max(psd)), color=colors['green'])
     ax.set_ylim(-20, 0)
     ax.set_xlabel('Frequency [Hz]')
     ax.set_ylabel('Power [dB]')
@@ -93,6 +93,43 @@ def plot_rate_psd():
     ax.set_ylabel('Power [dB]')
     fig.savefig('filter-ratepsd')
     
+
+def plot_ratetransfer():
+    """ Plot transfer fucntion for spike frequency.
+    """
+    dt = 0.0001               # integration time step in seconds
+    tmax = 500.0              # stimulus duration
+    cutoff = 1010.0           # highest frequency in stimulus
+    nfft = 2**14              # number of samples for Fourier trafo
+    stimulus = 5.0 + 2.5*filter.whitenoise(0.0, cutoff, dt, tmax)
+    time = np.arange(len(stimulus))*dt
+    rate, adapt = filter.adaptation(time, stimulus, alpha=0.05, taua=0.02)
+    # gain stimulus - rate:
+    freqs, csd = sig.csd(stimulus, rate, fs=1.0/dt, nperseg=nfft)
+    freqs, psd = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
+    transfer = csd/psd
+    # gain is only meaningful up to cutoff frequency:
+    transfer = transfer[freqs<cutoff]
+    freqs = freqs[freqs<cutoff]
+    # gain:
+    gain = np.abs(transfer)
+    # plots:
+    fig, axs = plt.subplots(1, 2, figsize=(figwidth, 0.4*figwidth))
+    ax = axs[0]
+    ax.plot(freqs, gain, color=colors['orange'])
+    ax.set_xlabel('Frequency [Hz]')
+    ax.set_ylabel('Gain')
+    ax.set_xlim(0, 200)
+    ax.set_ylim(0, 30)
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(10.0))
+    ax = axs[1]
+    ax.plot(freqs, gain, color=colors['orange'])
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.set_ylim(10, 40)
+    ax.set_xlabel('Frequency [Hz]')
+    fig.savefig('filter-rategain')
+
 
 def plot_transfer(axf, axfl, axa, axal):
     """ Plot transfer fucntion for spike frequency and adaptation level.
@@ -143,6 +180,7 @@ if __name__ == "__main__":
     plot_stimulus()
     plot_stimulus_psd()
     plot_rate_psd()
+    plot_ratetransfer()
 
 
     

@@ -180,7 +180,7 @@ freqs, psd = sig.welch(rate, fs=1.0/dt, nperseg=nfft)
 These spectra differ in two respects from the stimulus spectra. First,
 we see the high-pass filter effect of adaptation. Low frequency
 components are attenuated. Second, we have power at frequencies higher
-then the cutoff frequency of the stimulus. This high-frequency power
+than the cutoff frequency of the stimulus. This high-frequency power
 results from the non-linear shape of the *f-I* curves.
 
 > How does the adaptation time constant influence the response spectrum?
@@ -189,3 +189,65 @@ results from the non-linear shape of the *f-I* curves.
 > response spectrum?
 
 
+## Transfer function
+
+The transfer function relates the response to the stimulus at each
+frequency component. It is computed from the cross-spectrum between
+stimulus and response (`scipy.signal.csd()` function), divided by the
+power spectrum of the stimulus. The cross spectrum is very similar to
+a power spectrum. Instead of taking the square of the Fourier
+transformation of a signal, it multiplies the Fourier transformations
+of two different signals, here the ones of the response and the
+stimulus.
+
+```
+freqs, csd = sig.csd(stimulus, rate, fs=1.0/dt, nperseg=nfft)
+freqs, psd = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
+transfer = csd/psd
+```
+
+Since we divide by the stimulus power spectrum, and since by
+construction of the white noise stimulus there is no stimulus
+component at frequencies higher than the cut-off frequency (division
+by zero!), the transfer function at frequencies beyond the cut-off
+frequency of the stimulus is not meaningful. We therefore only keep
+values below the cutoff frequency:
+
+```
+transfer = transfer[freqs<cutoff]
+freqs = freqs[freqs<cutoff]
+```
+
+The transfer function is a complex valued function of the
+frequencies. Its magnitude (absolute value) is the *gain*:
+
+```
+gain = np.abs(transfer)
+ax.plot(freqs, gain)
+```
+
+![rategain](filter-rategain.png)
+
+This figure was computed with the following parameters:
+```
+tmax = 500.0
+cutoff = 1000.0
+nfft = 2**14
+```
+The right panel is a double logarithmic plot of the same gain values
+shown in the left panel. The first-order high-pass filter of
+adaptation is clearly visible.
+
+Imagine a sine-wave stimulus with a certain amplitude. Then the
+response of the neuron is also a sine wave (if it behaves sufficiently
+linear). Its firing rate is modulated sinusoidaly with some
+amplitude. This amplitude of the response, the firing rate, divided by
+the amplitude of the stimulus is the gain at the frequency of the
+stimulus. The higher the gain, the strong the amplitude modulation of
+the response. The unit of the gain is the unit of the response divided
+by the unit of the stimulus.
+
+> How do the adaptation time constant and the adaptation strength influence the gain?
+
+> Vary the stimulus mean and standard deviation. Do they influence the
+> gain?
