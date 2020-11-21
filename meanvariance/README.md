@@ -191,6 +191,7 @@ modulated in its amplitude in the same way as the white noise stimulus from abov
 fstim = 40.0
 time = np.arange(0.0, tmax, dt)
 stimulus = 0.5*np.sin(2.0*np.pi*fstim*time)
+stimulus *= std
 ```
 We then compute the amplitude modulation with a low-pass filter at 2Hz:
 ``` py
@@ -201,10 +202,12 @@ ax.plot(time, am)
 
 ![amplitudemodulation](meanvariance-amplitudemodulation.png)
 
-The stimulus has a peak at the carrier frequency of 40Hz. This peak is
-broadened by the amplitude modulation. Thresholding this signal results in
-harmonics of the carrier frequency, but also in a peak at zero frequency.
-This low-frequency component is the amplitude modulation.
+The stimulus has a peak at the carrier frequency of 40Hz (middle
+panel). This peak is broadened by the amplitude
+modulation. Thresholding this signal results in harmonics of the
+carrier frequency, but also in a peak at zero frequency (bottom
+panel).  This low-frequency component is the amplitude modulation
+(red, lower and upper panel).
 
 
 ## Adaptation to the variance
