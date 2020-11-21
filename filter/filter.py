@@ -121,7 +121,8 @@ def whitenoise(cflow, cfup, dt, duration, rng=np.random):
     Generates white noise with a flat power spectrum between `cflow` and
     `cfup` Hertz, zero mean and unit standard deviation.  Note, that in
     particular for short segments of the generated noise the mean and
-    standard deviation can deviate from zero and one.
+    standard deviation of the returned noise can deviate from zero and
+    one.
 
     Parameters
     ----------
@@ -139,17 +140,18 @@ def whitenoise(cflow, cfup, dt, duration, rng=np.random):
     noise: 1-D array
         White noise.
     """
+    # number of elements needed for the noise stimulus:
+    n = int(np.ceil((duration+0.5*dt)/dt))
     # next power of two:
-    n = int(duration//dt)
     nn = int(2**(np.ceil(np.log2(n))))
-    # draw random numbers in Fourier domain:
+    # indices of frequencies with `cflow` and `cfup`:
     inx0 = int(np.round(dt*nn*cflow))
     inx1 = int(np.round(dt*nn*cfup))
     if inx0 < 0:
         inx0 = 0
     if inx1 >= nn/2:
         inx1 = nn/2
-    sigma = 0.5 / np.sqrt(float(inx1 - inx0))
+    # draw random numbers in Fourier domain:
     whitef = np.zeros((nn//2+1), dtype=complex)
     if inx0 == 0:
         whitef[0] = rng.randn()
@@ -159,6 +161,8 @@ def whitenoise(cflow, cfup, dt, duration, rng=np.random):
         inx1 = nn//2-1
     m = inx1 - inx0 + 1
     whitef[inx0:inx1+1] = rng.randn(m) + 1j*rng.randn(m)
+    # scaling factor to ensure standard deviation of one:
+    sigma = 0.5 / np.sqrt(float(inx1 - inx0))
     # inverse FFT:
     noise = np.real(np.fft.irfft(whitef))[:n]*sigma*nn
     return noise
@@ -166,10 +170,11 @@ def whitenoise(cflow, cfup, dt, duration, rng=np.random):
 
 def plot_whitenoise(ax):
     dt = 0.001              # integration time step in seconds
-    tmax = 1.01             # stimulus duration
-    cutoff = 50.0           # highest frequency in stimulus
+    tmax = 1.0              # stimulus duration in seconds
+    cutoff = 50.0           # highest frequency in stimulus in Hertz
     stimulus = whitenoise(0.0, cutoff, dt, tmax)
     time = np.arange(len(stimulus))*dt
+    print(time[-1])
     ax.plot(time, stimulus)
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('White noise')
@@ -177,9 +182,11 @@ def plot_whitenoise(ax):
 
 def plot_stimulus(ax):
     dt = 0.001              # integration time step in seconds
-    tmax = 1.01             # stimulus duration
-    cutoff = 50.0           # highest frequency in stimulus
-    stimulus = 6.0 + 2.0*whitenoise(0.0, cutoff, dt, tmax)
+    tmax = 1.0              # stimulus duration in seconds
+    cutoff = 50.0           # highest frequency in stimulus in Hertz
+    mean = 5.0              # stimulus mean
+    stdev = 2.5             # stimulus standard deviation
+    stimulus = mean + stdev*whitenoise(0.0, cutoff, dt, tmax)
     time = np.arange(len(stimulus))*dt
     ax.plot(time, stimulus)
     ax.set_xlabel('Time [s]')
@@ -237,7 +244,7 @@ def filter_demo():
     fig, axs = plt.subplots(3, 2, constrained_layout=True)
     plot_whitenoise(axs[0,0])
     plot_stimulus(axs[0,1])
-    plot_transfer(axs[1,0], axs[1,1], axs[2,0], axs[2,1])
+    #plot_transfer(axs[1,0], axs[1,1], axs[2,0], axs[2,1])
     plt.show()
 
         

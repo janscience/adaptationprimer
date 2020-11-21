@@ -7,26 +7,43 @@ import sys
 sys.path.insert(0, '..')
 from plotstyle import figwidth, colors
 
-def plot_whitenoise(ax):
+
+def plot_whitenoise():
     dt = 0.001              # integration time step in seconds
-    tmax = 1.01             # stimulus duration
-    cutoff = 50.0           # highest frequency in stimulus
-    stimulus = whitenoise(0.0, cutoff, dt, tmax)
+    tmax = 1.0              # stimulus duration
+    cutoff = 100.0          # highest frequency in stimulus
+    rng = np.random.RandomState(283)
+    stimulus = filter.whitenoise(0.0, cutoff, dt, tmax, rng)
     time = np.arange(len(stimulus))*dt
+    fig, ax = plt.subplots(figsize=(figwidth, 0.4*figwidth))
+    ax.axhline(0.0, linestyle='--', color=colors['gray'], lw=0.5)
+    ax.axhline(-1.0, linestyle=':', color=colors['gray'], lw=0.5)
+    ax.axhline(+1.0, linestyle=':', color=colors['gray'], lw=0.5)
     ax.plot(time, stimulus)
+    ax.set_ylim(-3.5, 3.5)
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('White noise')
+    fig.savefig('filter-whitenoise')
     
 
-def plot_stimulus(ax):
+def plot_stimulus():
     dt = 0.001              # integration time step in seconds
-    tmax = 1.01             # stimulus duration
+    tmax = 1.0              # stimulus duration
     cutoff = 50.0           # highest frequency in stimulus
-    stimulus = 6.0 + 2.0*whitenoise(0.0, cutoff, dt, tmax)
+    mean = 5.0              # stimulus mean
+    stdev = 2.5             # stimulus standard deviation
+    rng = np.random.RandomState(981)
+    stimulus = mean + stdev*filter.whitenoise(0.0, cutoff, dt, tmax, rng)
     time = np.arange(len(stimulus))*dt
+    fig, ax = plt.subplots(figsize=(figwidth, 0.4*figwidth))
+    ax.axhline(mean, linestyle='--', color=colors['gray'], lw=0.5)
+    ax.axhline(mean-stdev, linestyle=':', color=colors['gray'], lw=0.5)
+    ax.axhline(mean+stdev, linestyle=':', color=colors['gray'], lw=0.5)
     ax.plot(time, stimulus)
+    ax.set_ylim(-2, 12)
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Stimulus')
+    fig.savefig('filter-stimulus')
     
 
 def plot_transfer(axf, axfl, axa, axal):
@@ -36,10 +53,10 @@ def plot_transfer(axf, axfl, axa, axal):
     tmax = 100.0              # stimulus duration
     cutoff = 1010.0           # highest frequency in stimulus
     nfft = 2**12              # number of samples for Fourier trafo
-    stimulus = 6.0 + 2.0*whitenoise(0.0, cutoff, dt, tmax)
+    stimulus = 6.0 + 2.0*filter.whitenoise(0.0, cutoff, dt, tmax)
     time = np.arange(len(stimulus))*dt
-    rate, adapt = adaptation(time, stimulus, alpha=0.05, taua=0.02)
-    frate = isi_lowpass(time, rate)
+    rate, adapt = filter.adaptation(time, stimulus, alpha=0.05, taua=0.02)
+    frate = filter.isi_lowpass(time, rate)
     # transfer function stimulus - rate:
     freqs, csd = sig.csd(stimulus, rate, fs=1.0/dt, nperseg=nfft)
     freqs, psd = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
@@ -72,18 +89,10 @@ def plot_transfer(axf, axfl, axa, axal):
     axal.set_ylim(1e-2, 1e0)
     axal.set_xlabel('Frequency [Hz]')
 
-
-def filter_demo():
-    """ Demo of the filter properties of spike-frequency adaptation.
-    """
-    plt.rcParams['axes.xmargin'] = 0.0
-    fig, axs = plt.subplots(3, 2, constrained_layout=True)
-    plot_whitenoise(axs[0,0])
-    plot_stimulus(axs[0,1])
-    plot_transfer(axs[1,0], axs[1,1], axs[2,0], axs[2,1])
-    plt.show()
-
         
 if __name__ == "__main__":
-    filter_demo()
+    plot_whitenoise()
+    plot_stimulus()
+
+
     
