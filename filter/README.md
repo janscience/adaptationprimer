@@ -254,9 +254,10 @@ by the unit of the stimulus.
 The other aspect of the transfer function is the phase:
 ```
 phase = np.angle(transfer)
+ax.plot(freqs, phase)
 ```
-It is the phase in radians (between -&#960; and +&#960;) describing
-how the response is shifted in time relative to the stimulus at each
+The phase (in radians, between -&#960; and +&#960;) describes how the
+response is shifted in time relative to the stimulus at each
 frequency.
 
 ![ratephase](filter-ratephase.png)
