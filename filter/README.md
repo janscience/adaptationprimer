@@ -114,10 +114,13 @@ resolution (the difference between successive frequencies), is the
 inverse of the duration of the segments, i.e. `nfft*dt`. This is the
 period of a sine fitting into the segment. The larger `nfft`, the
 longer the segment, the higher the frequency resolution. Choose for
-`nfft` values that are powers of two, for this the Fourier
+`nfft` values that are powers of two. For those the Fourier
 transformation is most efficient. Start with `nfft=2**10`. Needless to
-say that you stimulus needs to contain at least this many
-samples. Better are at least five times more.
+say that your stimulus needs to contain at least this many
+samples. Better are at least five times more. The more data are
+provided to the `welch()` function, the higher the number of segments
+that can be averaged, the better (less noisy) the estimate of the
+spectrum.
 
 The maximum frequency returned is half the sampling rate. This is the
 Nyquist theorem. To be able to detect a sine wave of a give frequency,
@@ -158,3 +161,31 @@ ax.set_ylim(-20, 0)
 
 > For which values of `nfft` and the stimulus duration do you get
 > smoother power spectra?
+
+
+## Power spectrum of the response
+
+In the very same way as for the stimulus we can estimate a power
+spectrum of the neuronal response. Let us simulate the firing rate of
+an adapting neuron and compute its power spectrum:
+```
+stimulus = mean + stdev*filter.whitenoise(0.0, cutoff, dt, tmax)
+time = np.arange(len(stimulus))*dt
+rate, adapt = adaptation(time, stimulus, alpha=0.05, taua=0.02)
+freqs, psd = sig.welch(rate, fs=1.0/dt, nperseg=nfft)
+```
+
+![stimulus](filter-ratepsd.png)
+
+These spectra differ in two respects from the stimulus spectra. First,
+we see the high-pass filter effect of adaptation. Low frequency
+components are attenuated. Second, we have power at frequencies higher
+then the cutoff frequency of the stimulus. This high-frequency power
+results from the non-linear shape of the *f-I* curves.
+
+> How does the adaptation time constant influence the response spectrum?
+
+> Vary the stimulus mean and standard deviation. Do they influence the
+> response spectrum?
+
+
