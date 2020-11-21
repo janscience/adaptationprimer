@@ -151,7 +151,7 @@ stimulus += 2.0
 
 The same neuron from above responds in the following way to this stimulus:
 
-![meanthreshold](meanvariance-meanthreshold.png)
+![variancethreshold](meanvariance-variancethreshold.png)
 
 The adaptation variable somehow tracks the changes in stimulus
 variance.  But because the neuron's *f-I* curve is shifted, the
