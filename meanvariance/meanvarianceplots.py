@@ -27,19 +27,29 @@ def plot_meanstimulus():
     ax.set_ylim(-1.5, 7.5)
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Stimulus')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
     fig.savefig('meanvariance-meanstimulus')
     # response:
-    rate0, _ = mv.adaptation(time, stimulus, alpha=0.0, taua=0.5)
-    rate, _ = mv.adaptation(time, stimulus, alpha=0.2, taua=0.5)
-    # plot:
+    rate0, adapt0 = mv.adaptation(time, stimulus, alpha=0.0, taua=0.5)
+    rate, adapt = mv.adaptation(time, stimulus, alpha=0.2, taua=0.5)
+    # plot rate:
     fig, ax = plt.subplots(figsize=(figwidth, 0.4*figwidth))
     ax.plot(time, rate0, color=colors['cyan'], label='non adapting')
     ax.plot(time, rate, color=colors['blue'], label='adapting')
     ax.set_ylim(0.0, 200.0)
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Spike frequency [Hz]')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
     ax.legend(loc='upper left')
     fig.savefig('meanvariance-meanresponse')
+    # plot adaptation:
+    fig, ax = plt.subplots(figsize=(figwidth, 0.4*figwidth))
+    ax.plot(time, adapt, color=colors['red'], label='adapting')
+    ax.set_ylim(0.0, 8.0)
+    ax.set_xlabel('Time [s]')
+    ax.set_ylabel('Adaptation')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
+    fig.savefig('meanvariance-meanadapt')
     
         
 if __name__ == "__main__":

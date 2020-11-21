@@ -43,11 +43,11 @@ ax.plot(time, mean)
 Compute the spike-frequency response of a non-adaptating neuron
 (&#120572; = 0)
 ``` py
-rate0, _ = adaptation(time, stimulus, alpha=0.0, taua=0.5)
+rate0, adapt0 = adaptation(time, stimulus, alpha=0.0, taua=0.5)
 ```
 and of a strongly adapting neuron (&#120572; = 0.2) to this stimulus
 ``` py
-rate, _ = adaptation(time, stimulus, alpha=0.2, taua=0.5)
+rate, adapt = adaptation(time, stimulus, alpha=0.2, taua=0.5)
 ```
 and plot the resulting spike frequencies:
 
@@ -62,6 +62,11 @@ the stimuls mean switches to higher values, the neuron transiently
 responds with a high spike frequency that then decays to lower levels.
 When the mean is switched to lower values, the neuron ceases firing
 until it recovers from adaptation.
+
+The adaptation variable quickly adapts to the new mean values and then fluctuates
+only slightly around the new value. Recovery from adaptation takes much longer.
+
+![meanadapt](meanvariance-meanadapt.png)
 
 
 ## Computing the amplitude modulation

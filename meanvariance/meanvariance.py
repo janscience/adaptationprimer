@@ -141,9 +141,9 @@ def plot_meanstimulus(axs, axr):
         mean[(time>k*T) & (time<=(k+1)*T)] += m
     stimulus += mean
     # response of non adapting neuron:
-    rate0, _ = adaptation(time, stimulus, alpha=0.0, taua=0.5)
+    rate0, adapt0 = adaptation(time, stimulus, alpha=0.0, taua=0.5)
     # response of adapting neuron:
-    rate, _ = adaptation(time, stimulus, alpha=0.2, taua=0.5)
+    rate, adapt = adaptation(time, stimulus, alpha=0.2, taua=0.5)
     # plot:
     axs.plot(time, stimulus)
     axs.set_xlabel('Time [s]')
