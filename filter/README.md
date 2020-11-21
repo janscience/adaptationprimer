@@ -108,7 +108,7 @@ i.e. the inverse time step, via the `fs` argument to the `welch()`
 function.
 
 The most important parameter is the length of the segments, `nfft`
-(`the `nperseg` argument to the `welch()` function). The lowest
+(the `nperseg` argument to the `welch()` function). The lowest
 frequency the `welch()` function returns, and also the frequency
 resolution (the difference between successive frequencies), is the
 inverse of the duration of the segments, i.e. `nfft*dt`. This is the
@@ -132,7 +132,8 @@ parameter.
 
 ```
 import scipy.signal as sig
-tmax = 100.0
+tmax = 100.0           # more than just a second!
+cutoff = 200.0
 stimulus = mean + stdev*whitenoise(0.0, cutoff, dt, tmax)
 nfft = 2**10
 freqs, psd = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
@@ -157,6 +158,3 @@ ax.set_ylim(-20, 0)
 
 > For which values of `nfft` and the stimulus duration do you get
 > smoother power spectra?
-
-
-
