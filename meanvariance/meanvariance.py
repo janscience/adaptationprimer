@@ -130,12 +130,15 @@ def whitenoise(cflow, cfup, dt, duration, rng=np.random):
 
 def plot_meanstimulus(ax):
     dt = 0.001              # integration time step in seconds
-    tmax = 3.0              # stimulus duration in seconds
-    cutoff = 50.0           # highest frequency in stimulus in Hertz
-    stimulus = whitenoise(0.0, cutoff, dt, tmax)
+    tmax = 4.0              # stimulus duration in seconds
+    cutoff = 50.0           # cutoff frequency of stimulus in Hertz
+    stimulus = 0.5*whitenoise(0.0, cutoff, dt, tmax)
     time = np.arange(len(stimulus))*dt
-    stimulus[(time>1.0) & (time<2.0)] += 3.0
-    stimulus[(time>2.0) & (time<3.0)] += 6.0
+    mean = np.zeros(len(stimulus))
+    mean[(time>1.0) & (time<=2.0)] += 3.0
+    mean[(time>2.0) & (time<=3.0)] += 6.0
+    mean[(time>3.0) & (time<=4.0)] += 1.5
+    stimulus += mean
     ax.plot(time, stimulus)
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Stimulus')
