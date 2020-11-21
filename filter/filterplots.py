@@ -46,6 +46,29 @@ def plot_stimulus():
     fig.savefig('filter-stimulus')
     
 
+def plot_stimulus_psd():
+    dt = 0.001              # integration time step in seconds
+    tmax = 100.0            # stimulus duration
+    cutoff = 200.0          # highest frequency in stimulus
+    mean = 5.0              # stimulus mean
+    stdev = 2.5             # stimulus standard deviation
+    nfft = 2**10            # nfft for power spectrum estimate
+    rng = np.random.RandomState(981)
+    stimulus = mean + stdev*filter.whitenoise(0.0, cutoff, dt, tmax, rng)
+    freqs, psd = sig.welch(stimulus, fs=1.0/dt, nperseg=nfft)
+    fig, axs = plt.subplots(1, 2, figsize=(figwidth, 0.4*figwidth))
+    ax = axs[0]
+    ax.plot(freqs, psd)
+    ax.set_xlabel('Frequency [Hz]')
+    ax.set_ylabel('Power')
+    ax = axs[1]
+    ax.plot(freqs, 10.0*np.log10(psd/np.max(psd)))
+    ax.set_ylim(-20, 0)
+    ax.set_xlabel('Frequency [Hz]')
+    ax.set_ylabel('Power [dB]')
+    fig.savefig('filter-psd')
+    
+
 def plot_transfer(axf, axfl, axa, axal):
     """ Plot transfer fucntion for spike frequency and adaptation level.
     """
@@ -93,6 +116,7 @@ def plot_transfer(axf, axfl, axa, axal):
 if __name__ == "__main__":
     plot_whitenoise()
     plot_stimulus()
+    plot_stimulus_psd()
 
 
     
