@@ -78,6 +78,15 @@ stimulus = mean + stdev*whitenoise(0.0, cutoff, dt, tmax)
 
 ![stimulus](filter-stimulus.png)
 
+> Plot the white noise stimulus for different cutoff frequencies.
+
+> Plot a histogram of the white noise stimulus amplitudes.
+
+> Check the mean and standard deviation of the white noise stimulus.
+
+> How close are the mean and the standard deviation of the white noise
+> stimulus to the requested ones? Check this for various stimulus
+> durations of, for example, 1s, 10s, 100s, 1000s.
 
 
 
