@@ -57,6 +57,15 @@ the non-linear *f-I* curves of the neuron. [Read
 more in `filter/`.](filter/README.md)
 
 
+## Adaptation to stimulus mean and variance
+
+Subtractive adaptation is perfectly suited to make the neuron's
+response invariant with respect to the mean of the
+stimulus. Invariance to the stimulus variance, however, requires
+thresholding to extract the amplitude modulation and divisive
+adaptation. [Read more in `meanvariance/`.](meanvariance/README.md)
+
+
 ## Contributing
 
 You are welcome to improve the code and the explanations. Or even add
