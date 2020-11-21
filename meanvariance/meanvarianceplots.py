@@ -21,6 +21,7 @@ def plot_meanstimulus():
     for k, m in enumerate(means):
         mean[(time>k*T) & (time<=(k+1)*T)] += m
     stimulus += mean
+    # plot stimulus:
     fig, ax = plt.subplots(figsize=(figwidth, 0.4*figwidth))
     ax.plot(time, stimulus, color=colors['green'])
     ax.plot(time, mean, '--', color=colors['lightgreen'])
@@ -50,6 +51,17 @@ def plot_meanstimulus():
     ax.set_ylabel('Adaptation')
     ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
     fig.savefig('meanvariance-meanadapt')
+    # plot stimulus and threshold:
+    fig, ax = plt.subplots(figsize=(figwidth, 0.4*figwidth))
+    ax.plot(time, stimulus, color=colors['green'], label='stimulus')
+    ax.fill_between(time, adapt, -1.5, fc=colors['gray'], alpha=0.75)
+    ax.plot(time, adapt, color=colors['red'], label='threshold')
+    ax.set_ylim(-1.5, 7.5)
+    ax.set_xlabel('Time [s]')
+    ax.set_ylabel('Stimulus')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
+    ax.legend(loc='upper left')
+    fig.savefig('meanvariance-meanthreshold')
     
         
 if __name__ == "__main__":

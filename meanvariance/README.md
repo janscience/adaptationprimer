@@ -68,6 +68,17 @@ only slightly around the new value. Recovery from adaptation takes much longer.
 
 ![meanadapt](meanvariance-meanadapt.png)
 
+Since the adaptation variable is given in units of the stimulus, and
+it governs the shift of the neuron's *f-I* curve, we can plot it on
+top of the stimulus.  In our model, the rheobase of the unadapted
+*f-I* curve is at zero.  Therefore the adaptation variable can be read
+as the time course of the rheobase of the neuron.
+
+![meanthreshold](meanvariance-meanthreshold.png)
+
+Stimulus values (green) below the current value of the rheobase (red)
+are not transmitted by the neuron (gray shading).
+
 
 ## Computing the amplitude modulation
 
