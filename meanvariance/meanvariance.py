@@ -32,7 +32,7 @@ def upper_boltzmann(x, ymax=1.0, x0=0.0, slope=1.0):
 
 
 def adaptation(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, fmax=200.0):
-    """ Spike-frequency of an adaptating neuron with sigmoidal onset f-I curve.
+    """ Subtractive spike-frequency of an adaptating neuron with sigmoidal onset f-I curve.
 
     Parameters
     ----------
@@ -72,6 +72,51 @@ def adaptation(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, fmax=200.
         rate[k] = f
         f = upper_boltzmann(stimulus[k] - a, fmax, I0, slope)
         a += (alpha*f - a)*dt/taua
+    return rate, adapt
+
+
+def divisive_adaptation(time, stimulus, taua=0.1, slope=1.0, I0=0.0, fmax=200.0):
+    """ Divisive spike-frequency of an adaptating neuron with sigmoidal onset f-I curve.
+
+    Parameters
+    ----------
+    time: 1D array
+        Time vector. Sets the integration time step.
+    stimulus: 1D array
+        For each time point in `time` the stimulus value.
+    taua: float
+        Adaptation time constant, same unit as `time`.
+    slope: float
+        Slope of the sigmoidal f-I curve.
+    I0: float
+        Position of the sigmoidal f-I curve.
+    fmax: float
+        Maximum spike frequency of the onset f-I curve.  
+
+    Returns
+    -------
+    rate: 1D array
+        The resulting time course of the spike frequency.
+    adapt: 1D array
+        The time course of the adaptation level.
+    """
+    #alpha = 0.2
+    dt = time[1] - time[0]
+    # integrate to steady-state of first stimulus value:
+    a = 1.0
+    for k in range(int(5*taua//dt)):
+        f = upper_boltzmann(stimulus[0]/a, fmax, I0, slope)
+        #a += (alpha*f - a)*dt/taua
+        a += (stimulus[0] - a)*dt/taua
+    # integrate:
+    rate = np.zeros(len(stimulus))
+    adapt = np.zeros(len(stimulus))
+    for k in range(len(stimulus)):
+        f = upper_boltzmann(stimulus[k]/a, fmax, I0, slope)
+        #a += (alpha*f - a)*dt/taua
+        a += (stimulus[k] - a)*dt/taua
+        adapt[k] = a
+        rate[k] = f
     return rate, adapt
 
 
@@ -284,6 +329,34 @@ def plot_amplitudemodulation(axs):
     ax.set_ylabel('Power thresh. stimulus [dB]')
     
 
+def plot_divisivevariance(axs, axr):
+    dt = 0.001                    # integration time step in seconds
+    tmax = 4.0                    # stimulus duration in seconds
+    cutoff = 60.0                 # cutoff frequency of stimulus in Hertz
+    T = 1.0                       # duration of segements with constant mean in seconds
+    stdevs = [0.5, 1.5, 3.0, 0.5] # standard deviations for each segment
+    stimulus = 0.5*whitenoise(0.0, cutoff, dt, tmax)
+    time = np.arange(len(stimulus))*dt
+    std = np.zeros(len(stimulus))
+    for k, s in enumerate(stdevs):
+        std[(time>k*T) & (time<=(k+1)*T)] += s
+    stimulus *= std
+    stimulus[stimulus<0.0] = 0.0
+    # response of non adapting neuron:
+    rate0, adapt0 = adaptation(time, stimulus, alpha=0.2, taua=0.3, slope=0.5)
+    # response of adapting neuron:
+    rate, adapt = divisive_adaptation(time, stimulus, taua=0.3, slope=0.1)
+    # plot:
+    axs.set_title('Divisive variance')
+    axs.plot(time, adapt, label='threshold')
+    axs.set_ylabel('Adaptation')
+    axr.plot(time, rate0, label='non adapting')
+    axr.plot(time, rate, label='adapting')
+    axr.set_xlabel('Time [s]')
+    axr.set_ylabel('Spike frequency [Hz]')
+    axr.legend(loc='upper left')
+    
+
 def meanvariance_demo():
     """ Demo of adaptation to the mean and variance of a stimulus.
     """
@@ -291,7 +364,8 @@ def meanvariance_demo():
     fig, axs = plt.subplots(2, 3, constrained_layout=True)
     plot_meanstimulus(axs[0,0], axs[1,0])
     plot_meansine(axs[0,1], axs[1,1])
-    plot_variancestimulus(axs[0,2], axs[1,2])
+    #plot_variancestimulus(axs[0,2], axs[1,2])
+    plot_divisivevariance(axs[0,2], axs[1,2])
     fig, axs = plt.subplots(3, 1, constrained_layout=True)
     plot_amplitudemodulation(axs)
     plt.show()
