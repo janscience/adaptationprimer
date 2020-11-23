@@ -329,7 +329,7 @@ def plot_amplitudemodulation(axs):
     ax.set_ylabel('Power thresh. stimulus [dB]')
     
 
-def plot_divisivevariance(axs, axr):
+def plot_divisiveadapt(axs, axr):
     dt = 0.001                    # integration time step in seconds
     tmax = 4.0                    # stimulus duration in seconds
     cutoff = 60.0                 # cutoff frequency of stimulus in Hertz
@@ -364,10 +364,11 @@ def meanvariance_demo():
     fig, axs = plt.subplots(2, 3, constrained_layout=True)
     plot_meanstimulus(axs[0,0], axs[1,0])
     plot_meansine(axs[0,1], axs[1,1])
-    #plot_variancestimulus(axs[0,2], axs[1,2])
-    plot_divisivevariance(axs[0,2], axs[1,2])
+    plot_variancestimulus(axs[0,2], axs[1,2])
     fig, axs = plt.subplots(3, 1, constrained_layout=True)
     plot_amplitudemodulation(axs)
+    fig, axs = plt.subplots(2, 2, constrained_layout=True)
+    plot_divisiveadapt(axs[0,0], axs[1,0])
     plt.show()
 
         

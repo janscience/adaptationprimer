@@ -178,8 +178,9 @@ amplitude modulation.
 
 ``` py
 def amplitude_modulation(signal, dt, fcutoff):
-    signal = np.array(signal)
-    signal[signal<0.0] = 0.0
+    signal = np.array(signal)            # copy the signal
+    signal[signal<0.0] = 0.0             # thresholding
+    # low-pass filter:
     sos = sig.butter(2, fcutoff, 'lp', fs=1.0/dt, output='sos')
     am = 2.0*sig.sosfilt(sos, signal)    # factor two to make up for thresholding
     return am
@@ -210,5 +211,50 @@ panel).  This low-frequency component is the amplitude modulation
 (red, lower and upper panel).
 
 
-## Adaptation to the variance
+## Divisive adaptation
 
+As we just have seen we need to threshold the stimulus and then apply a
+low-pass filter in order to retrieve the stimulus's (square-root of its)
+variance. The low-pass filter could be implemented by the adaptation
+dynamics - it is a low-pass filter applied to either the neuron's
+spike frequency in case of output driven adaptation or to the
+thresholded stimulus in case of input driven adaptation. Let's use the
+latter:
+
+<img src=
+"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Ctau_a+%5Cdot+A+%3D++-+A+%2B+%5Clfloor+I+%5Crfloor" 
+alt="\tau_a \dot A =  - A + \lfloor I \rfloor">
+
+For the adaptation to scale away the changing variance of the stimulus
+it needs to act divisively and not subtractively on the input:
+
+<img src=
+"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+f+%3D+f_0%28I%2FA%29" 
+alt="f = f_0(I/A)">
+
+Without the thresholding operation this can be implemented as follows:
+``` py
+def divisive_adaptation(time, stimulus, taua=0.1, slope=1.0, I0=0.0, fmax=200.0):
+    dt = time[1] - time[0]
+    a = 1.0
+    rate = np.zeros(len(stimulus))
+    adapt = np.zeros(len(stimulus))
+    for k in range(len(stimulus)):
+        f = upper_boltzmann(stimulus[k]/a, fmax, I0, slope)
+        a += (stimulus[k] - a)*dt/taua
+        adapt[k] = a
+        rate[k] = f
+    return rate, adapt
+```
+
+Apply the thresholding and the divisive adaptation model to the stimulus from above
+``` py
+stimulus[stimulus<0.0] = 0.0     # thresholding
+rate, adapt = divisive_adaptation(time, stimulus, taua=0.3, slope=0.1)
+```
+results in a response that is invariant to the stimulus' variance.
+
+![divisiveadapt](meanvariance-divisiveadapt.png)
+
+
+## Adaptation to the variance
