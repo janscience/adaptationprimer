@@ -305,3 +305,9 @@ mean and variance, except for the transients right after the steps.
 
 ![meanvaradapt](meanvariance-meanvaradapt.png)
 
+
+## References
+
+## Next
+
+Continue reading about [stimulus-specific adaptation](../ssa/README.md).

@@ -66,6 +66,12 @@ thresholding to extract the amplitude modulation and divisive
 adaptation. [Read more in `meanvariance/`.](meanvariance/README.md)
 
 
+## Stimulus-specific adaptation
+
+Adaptation in parallel pathways leads to stimulus-specific
+adaptation. [Read more in `ssa/`.](ssa/README.md)
+
+
 ## Contributing
 
 You are welcome to improve the code and the explanations. Or even add
