@@ -163,6 +163,8 @@ stimulus variance. But because the neuron's *f-I* curve is shifted,
 the response is not invariant to the changes in stimulus variance,
 peak spike frequencies increase with stimulus variance.
 
+> Try different adaptation time constants and adaptation strengths.
+
 
 ## Extracting the amplitude modulation
 
@@ -210,6 +212,11 @@ carrier frequency, but also in a peak at zero frequency (bottom
 panel).  This low-frequency component is the amplitude modulation
 (red, lower and upper panel).
 
+> - Construct a stimulus with a sinewave carrier and a sinusoidal
+>   amplitude modulation.
+> - Vary the frequency and the amplitude of the amplitude modulation.
+> - Retrieve the amplitude modulation and compare with the original one.
+
 
 ## Divisive adaptation
 
@@ -255,6 +262,9 @@ Note that the steady-state *f-I* curve is independent of the
 stimulus. The adapted *f-I* curve is not shifted but scaled along the
 stimulus-axis.
 
+> Compute and plot adapted *f-I* curves for different values of the
+> preadaptation stimulus.
+
 
 ## Adaptation to the variance
 
@@ -270,6 +280,8 @@ results in a response that is largely invariant to the stimulus'
 variance, except for the transients right after the steps.
 
 ![divisiveadapt](meanvariance-divisiveadapt.png)
+
+> Check how the adaptation time constant affects the response.
 
 
 ## Adaptation to mean and variance
@@ -306,6 +318,9 @@ results in a response that is largely invariant to the stimulus'
 mean and variance, except for the transients right after the steps.
 
 ![meanvaradapt](meanvariance-meanvaradapt.png)
+
+> Check different values of the adaptation time constants of both adaptation processes.
+> How do different ratios of the two time constants affects the response?
 
 
 ## References
