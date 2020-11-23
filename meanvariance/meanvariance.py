@@ -197,6 +197,9 @@ def amplitude_modulation(signal, dt, fcutoff):
 
 
 def plot_meanstimulus(axs, axr):
+    """Adapting and non-adapting spike frequencies to a noise stimulus with
+    segment wise different mean values.
+    """
     dt = 0.001                    # integration time step in seconds
     tmax = 4.0                    # stimulus duration in seconds
     cutoff = 20.0                 # cutoff frequency of stimulus in Hertz
@@ -226,6 +229,8 @@ def plot_meanstimulus(axs, axr):
     
 
 def plot_meansine(axs, axr):
+    """ Adaptation to noise stimulus with cosine.
+    """
     dt = 0.001                    # integration time step in seconds
     tmax = 4.0                    # stimulus duration in seconds
     cutoff = 40.0                 # cutoff frequency of stimulus in Hertz
@@ -251,6 +256,8 @@ def plot_meansine(axs, axr):
     
 
 def plot_variancestimulus(axs, axr):
+    """ Subtractive adaptation to stimulus with segment wise different variances.
+    """
     dt = 0.001                    # integration time step in seconds
     tmax = 4.0                    # stimulus duration in seconds
     cutoff = 60.0                 # cutoff frequency of stimulus in Hertz
@@ -281,6 +288,8 @@ def plot_variancestimulus(axs, axr):
     
 
 def plot_amplitudemodulation(axs):
+    """ Amplitude modulation and power spectra of sine wave.
+    """
     dt = 0.001                    # integration time step in seconds
     tmax = 4.0                    # stimulus duration in seconds
     cutoffl = 40.0                # lower cutoff frequency of stimulus in Hertz
@@ -326,7 +335,42 @@ def plot_amplitudemodulation(axs):
     ax.set_ylabel('Power thresh. stimulus [dB]')
     
 
+def plot_divisiveficurves(ax):
+    """ Plot f-I curves of divisive adaptation.
+    """
+    dt = 0.0001               # integration time step in seconds
+    time = np.arange(-0.05, 0.5, dt)
+    inputs = np.arange(0, 4.1, 0.1)
+    stimulus = np.zeros(len(time)) + 0.1
+    f0 = []
+    fs = []
+    for s in inputs:
+        stimulus[time>0.0] = s
+        rate, _ = divisive_adaptation(time, stimulus, slope=0.2)
+        f0.append(np.max(rate))
+        fs.append(rate[-1])
+    time = np.arange(-0.05, 0.1, dt)
+    stimulus = np.zeros(len(time)) + 2.0
+    fa = []
+    for s in inputs:
+        stimulus[time>0.0] = s
+        rate, _ = divisive_adaptation(time, stimulus)
+        fb = np.mean(rate[(time>-0.05)&(time<0.0)])
+        arate = rate[(time>0.0) & (time<0.1)]
+        inx = np.argmax(np.abs(arate-fb))
+        fa.append(arate[inx])
+    ax.plot(inputs, f0, c='g', label=r'$f_0(I)$')
+    ax.plot(inputs, fs, c='r', label=r'$f_{\infty}(I)$')
+    ax.plot(inputs, fa, c='b', label=r'$f_{a}(I)$')
+    ax.set_ylim(0, 200)
+    ax.set_ylabel('Spike frequency [Hz]')
+    ax.set_xlabel('Stimulus')
+    ax.legend(loc='upper left')
+
+
 def plot_divisiveadapt(axs, axr):
+    """ Stimulus, adaptation and spike frequency to variance stimulus.
+    """
     dt = 0.001                    # integration time step in seconds
     tmax = 4.0                    # stimulus duration in seconds
     cutoff = 60.0                 # cutoff frequency of stimulus in Hertz
@@ -344,7 +388,6 @@ def plot_divisiveadapt(axs, axr):
     # response of adapting neuron:
     rate, adapt = divisive_adaptation(time, stimulus, taua=0.3, slope=0.1)
     # plot:
-    axs.set_title('Divisive variance')
     axs.plot(time, adapt, label='threshold')
     axs.set_ylabel('Adaptation')
     axr.plot(time, rate0, label='non adapting')
@@ -352,6 +395,38 @@ def plot_divisiveadapt(axs, axr):
     axr.set_xlabel('Time [s]')
     axr.set_ylabel('Spike frequency [Hz]')
     axr.legend(loc='upper left')
+    
+
+def plot_meanvaradapt(axs, axr):
+    """ Stimulus, adaptation and spike frequency to mean-variance stimulus.
+    """
+    dt = 0.001                    # integration time step in seconds
+    tmax = 4.0                    # stimulus duration in seconds
+    cutoff = 60.0                 # cutoff frequency of stimulus in Hertz
+    T = 1.0                       # duration of segements with constant mean in seconds
+    means = [1.0, 3.0, 6.0, 2.0]  # mean stimulus values for each segment
+    stdevs = [1.0, 3.0, 1.5, 0.5] # standard deviations for each segment
+    rng = np.random.RandomState(583)
+    stimulus = 0.5*whitenoise(0.0, cutoff, dt, tmax, rng)
+    time = np.arange(len(stimulus))*dt
+    mean = np.zeros(len(stimulus))
+    for k, m in enumerate(means):
+        mean[(time>k*T) & (time<=(k+1)*T)] += m
+    std = np.zeros(len(stimulus))
+    for k, s in enumerate(stdevs):
+        std[(time>k*T) & (time<=(k+1)*T)] += s
+    stimulus *= std
+    stimulus += mean
+    # adaptation:
+    rate1, adapt1 = adaptation(time, stimulus, alpha=0.2, taua=0.5)
+    rate1[rate1<0.0] = 0.0        # thresholding
+    rate2, adapt2 = divisive_adaptation(time, rate1, taua=0.3, slope=0.1)
+    # plot:
+    axs.plot(time, stimulus, label='stimulus')
+    axs.set_ylabel('Stimulus')
+    axr.plot(time, rate2, label='adapting')
+    axr.set_xlabel('Time [s]')
+    axr.set_ylabel('Spike frequency [Hz]')
     
 
 def meanvariance_demo():
@@ -364,8 +439,11 @@ def meanvariance_demo():
     plot_variancestimulus(axs[0,2], axs[1,2])
     fig, axs = plt.subplots(3, 1, constrained_layout=True)
     plot_amplitudemodulation(axs)
-    fig, axs = plt.subplots(2, 2, constrained_layout=True)
-    plot_divisiveadapt(axs[0,0], axs[1,0])
+    fig, axs = plt.subplots(3, 1, constrained_layout=True)
+    plot_divisiveficurves(axs[0])
+    plot_divisiveadapt(axs[1], axs[2])
+    fig, axs = plt.subplots(2, 1, constrained_layout=True)
+    plot_meanvaradapt(axs[0], axs[1])
     plt.show()
 
         
