@@ -259,14 +259,49 @@ def plot_divisiveadapt():
     ax.set_ylabel('Spike frequency [Hz]')
     fig.savefig('meanvariance-divisiveadapt')
     
+
+def plot_meanvaradapt():
+    dt = 0.001                    # integration time step in seconds
+    tmax = 4.0                    # stimulus duration in seconds
+    cutoff = 60.0                 # cutoff frequency of stimulus in Hertz
+    T = 1.0                       # duration of segements with constant mean in seconds
+    means = [0.0, 4.0, 6.0, 2.0]  # mean stimulus values for each segment
+    stdevs = [1.0, 3.0, 1.5, 0.5] # standard deviations for each segment
+    rng = np.random.RandomState(583)
+    stimulus = 0.5*mv.whitenoise(0.0, cutoff, dt, tmax, rng)
+    time = np.arange(len(stimulus))*dt
+    mean = np.zeros(len(stimulus))
+    for k, m in enumerate(means):
+        mean[(time>k*T) & (time<=(k+1)*T)] += m
+    std = np.zeros(len(stimulus))
+    for k, s in enumerate(stdevs):
+        std[(time>k*T) & (time<=(k+1)*T)] += s
+    stimulus *= std
+    stimulus += mean
+    # adaptation:
+    rate1, adapt1 = mv.adaptation(time, stimulus, alpha=0.2, taua=0.5)
+    rate1[rate1<0.0] = 0.0        # thresholding
+    rate2, adapt2 = mv.divisive_adaptation(time, rate1, taua=0.3, slope=0.1)
+    # plot:
+    fig, axs = plt.subplots(2, 1, figsize=(figwidth, 0.6*figwidth))
+    ax = axs[0]
+    ax.plot(time, stimulus, color=colors['green'], label='stimulus')
+    ax.set_ylabel('Stimulus')
+    ax = axs[1]
+    ax.plot(time, rate2, color=colors['blue'], label='adapting')
+    ax.set_xlabel('Time [s]')
+    ax.set_ylabel('Spike frequency [Hz]')
+    fig.savefig('meanvariance-meanvaradapt')
+    
         
 if __name__ == "__main__":
-    #plot_meanstimulus()
-    #plot_meansine()
-    #plot_variancestimulus()
-    #plot_amplitudemodulation()
+    plot_meanstimulus()
+    plot_meansine()
+    plot_variancestimulus()
+    plot_amplitudemodulation()
     plot_divisiveficurves()
-    #plot_divisiveadapt()
+    plot_divisiveadapt()
+    plot_meanvaradapt()
 
 
     

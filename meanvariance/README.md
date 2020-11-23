@@ -269,3 +269,37 @@ variance, except for the transients right after the steps.
 
 ![divisiveadapt](meanvariance-divisiveadapt.png)
 
+
+## Adaptation to the mean and the variance
+
+A stimulus with segments that differ in mean and variance can be
+generated like this:
+
+``` py
+stimulus = 0.5*mv.whitenoise(0.0, cutoff, dt, tmax, rng)
+time = np.arange(len(stimulus))*dt
+mean = np.zeros(len(stimulus))
+for k, m in enumerate(means):
+    mean[(time>k*T) & (time<=(k+1)*T)] += m
+std = np.zeros(len(stimulus))
+for k, s in enumerate(stdevs):
+    std[(time>k*T) & (time<=(k+1)*T)] += s
+stimulus *= std
+stimulus += mean
+```
+
+First, subtractively adapt the response to the stimulus, then
+threshold the mean-free response, and finally apply divisive
+adaptation. This results in neuronal responses that are invariant to
+the mean and variance of the stimulus.
+
+``` py
+rate1, adapt1 = adaptation(time, stimulus, alpha=0.2, taua=0.5)
+rate1[rate1<0.0] = 0.0        # thresholding
+rate2, adapt2 = divisive_adaptation(time, rate1, taua=0.3, slope=0.1)
+```
+results in a response that is largely invariant to the stimulus'
+mean and variance, except for the transients right after the steps.
+
+![meanvaradapt](meanvariance-meanvaradapt.png)
+
