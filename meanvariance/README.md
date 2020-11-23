@@ -174,7 +174,7 @@ values of the stimulus to zero. This makes the stimulus asymmetric and
 the amplitude modulation appears as low-frequency components in its
 power spectrum. One then can filter the thresholded stimulus to
 isolate this low-frequency information and this way retrieve the
-amplitude modulation.
+amplitude modulation (Middleton et al., 2007).
 
 ``` py
 def amplitude_modulation(signal, dt, fcutoff):
@@ -258,8 +258,10 @@ stimulus-axis.
 
 ## Adaptation to the variance
 
-Applying the thresholding and the divisive adaptation model to the
-stimulus from above
+Many neurons show responses that are invariant to the variance of a
+stimulus (Brenner et al., 2000, Fairhall et al., 2001, Kastner and
+Baccus, 2004).  Applying the thresholding and the divisive adaptation
+model to the stimulus from above
 ``` py
 stimulus[stimulus<0.0] = 0.0     # thresholding
 rate, adapt = divisive_adaptation(time, stimulus, taua=0.3, slope=0.1)
@@ -292,8 +294,8 @@ stimulus += mean
 
 First, subtractively adapt the response to the stimulus, then
 threshold the mean-free response, and finally apply divisive
-adaptation. This results in neuronal responses that are invariant to
-the mean and variance of the stimulus.
+adaptation (Clemens et al., 2018). This results in neuronal responses
+that are invariant to the mean and variance of the stimulus.
 
 ``` py
 rate1, adapt1 = adaptation(time, stimulus, alpha=0.2, taua=0.5)
@@ -307,6 +309,17 @@ mean and variance, except for the transients right after the steps.
 
 
 ## References
+
+> Brenner N, Bialek W, de Ruyter van Steveninck RR (2000) Adaptive rescaling maximizes information transmission. *Neuron* 26: 695-702.
+ 
+> Clemens J, Ozeri-Engelhard N, Murthy M (2018) Fast intensity adaptation enhances the encoding of sound in *Drosophila*. *Nat Commun* 9:134.
+
+> Fairhall AL, Lewen GD, Bialek W, de Ruyter van Steveninck RR (2001) Efficiency and ambiguity in an adaptive neural code. *Nature* 412:787-792.
+
+> Kastner DB, Baccus SA (2014) Insights from the retina into the diverse and general computations of adaptation, detection, and prediction. *Curr Opin Neurobiol* 25:63-69.
+
+> Middleton JW, Harvey-Girard E, Maler L, Longtin A (2007) Envelope gating and noise shaping in populations of noisy neurons. *Phys Rev E* 75: 021918.
+
 
 ## Next
 
