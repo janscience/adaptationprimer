@@ -270,12 +270,14 @@ variance, except for the transients right after the steps.
 ![divisiveadapt](meanvariance-divisiveadapt.png)
 
 
-## Adaptation to the mean and the variance
+## Adaptation to mean and variance
 
 A stimulus with segments that differ in mean and variance can be
 generated like this:
 
 ``` py
+means = [1.0, 4.0, 6.0, 2.0]  # mean stimulus values for each segment
+stdevs = [1.0, 3.0, 1.5, 0.5] # standard deviations for each segment
 stimulus = 0.5*mv.whitenoise(0.0, cutoff, dt, tmax, rng)
 time = np.arange(len(stimulus))*dt
 mean = np.zeros(len(stimulus))

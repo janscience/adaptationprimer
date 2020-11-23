@@ -171,6 +171,7 @@ def plot_amplitudemodulation():
     ax = axs[0]
     ax.plot(time, stimulus, label='stimulus')
     ax.plot(time, am, label='AM')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
     ax.set_xlabel('Time')
     ax.set_ylabel('Stimulus')
     ax.legend(loc='upper right', bbox_to_anchor=(1.0, 1.2))
@@ -251,12 +252,14 @@ def plot_divisiveadapt():
     ax = axs[0]
     ax.plot(time, stimulus, color=colors['green'], label='stimulus')
     ax.plot(time, adapt, color=colors['red'], label='adaptation')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
     ax.set_ylabel('Adaptation')
     ax.legend(loc='upper left')
     ax = axs[1]
     ax.plot(time, rate, color=colors['blue'], label='adapting')
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Spike frequency [Hz]')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
     fig.savefig('meanvariance-divisiveadapt')
     
 
@@ -265,7 +268,7 @@ def plot_meanvaradapt():
     tmax = 4.0                    # stimulus duration in seconds
     cutoff = 60.0                 # cutoff frequency of stimulus in Hertz
     T = 1.0                       # duration of segements with constant mean in seconds
-    means = [0.0, 4.0, 6.0, 2.0]  # mean stimulus values for each segment
+    means = [1.0, 3.0, 6.0, 2.0]  # mean stimulus values for each segment
     stdevs = [1.0, 3.0, 1.5, 0.5] # standard deviations for each segment
     rng = np.random.RandomState(583)
     stimulus = 0.5*mv.whitenoise(0.0, cutoff, dt, tmax, rng)
@@ -287,10 +290,12 @@ def plot_meanvaradapt():
     ax = axs[0]
     ax.plot(time, stimulus, color=colors['green'], label='stimulus')
     ax.set_ylabel('Stimulus')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
     ax = axs[1]
     ax.plot(time, rate2, color=colors['blue'], label='adapting')
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Spike frequency [Hz]')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
     fig.savefig('meanvariance-meanvaradapt')
     
         
