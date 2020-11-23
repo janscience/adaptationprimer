@@ -247,14 +247,25 @@ def divisive_adaptation(time, stimulus, taua=0.1, slope=1.0, I0=0.0, fmax=200.0)
     return rate, adapt
 ```
 
-Apply the thresholding and the divisive adaptation model to the stimulus from above
+The *f-I* curves look like this:
+
+![divisiveficurves](meanvariance-divisiveficurves.png)
+
+Note that the steady-state *f-I* curve is independent of the
+stimulus. The adapted *f-I* curve is not shifted but scaled along the
+stimulus-axis.
+
+
+## Adaptation to the variance
+
+Applying the thresholding and the divisive adaptation model to the
+stimulus from above
 ``` py
 stimulus[stimulus<0.0] = 0.0     # thresholding
 rate, adapt = divisive_adaptation(time, stimulus, taua=0.3, slope=0.1)
 ```
-results in a response that is invariant to the stimulus' variance.
+results in a response that is largely invariant to the stimulus'
+variance, except for the transients right after the steps.
 
 ![divisiveadapt](meanvariance-divisiveadapt.png)
 
-
-## Adaptation to the variance

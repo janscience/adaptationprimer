@@ -100,20 +100,17 @@ def divisive_adaptation(time, stimulus, taua=0.1, slope=1.0, I0=0.0, fmax=200.0)
     adapt: 1D array
         The time course of the adaptation level.
     """
-    #alpha = 0.2
     dt = time[1] - time[0]
     # integrate to steady-state of first stimulus value:
     a = 1.0
     for k in range(int(5*taua//dt)):
         f = upper_boltzmann(stimulus[0]/a, fmax, I0, slope)
-        #a += (alpha*f - a)*dt/taua
         a += (stimulus[0] - a)*dt/taua
     # integrate:
     rate = np.zeros(len(stimulus))
     adapt = np.zeros(len(stimulus))
     for k in range(len(stimulus)):
         f = upper_boltzmann(stimulus[k]/a, fmax, I0, slope)
-        #a += (alpha*f - a)*dt/taua
         a += (stimulus[k] - a)*dt/taua
         adapt[k] = a
         rate[k] = f

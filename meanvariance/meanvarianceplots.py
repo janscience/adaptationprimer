@@ -194,6 +194,43 @@ def plot_amplitudemodulation():
     fig.savefig('meanvariance-amplitudemodulation')
     
 
+def plot_divisiveficurves():
+    """ Plot f-I curves of divisive adaptation.
+    """
+    dt = 0.0001               # integration time step in seconds
+    time = np.arange(-0.05, 0.5, dt)
+    inputs = np.arange(0, 4.1, 0.1)
+    stimulus = np.zeros(len(time)) + 0.1
+    f0 = []
+    fs = []
+    for s in inputs:
+        stimulus[time>0.0] = s
+        rate, _ = mv.divisive_adaptation(time, stimulus, slope=0.2)
+        f0.append(np.max(rate))
+        fs.append(rate[-1])
+    time = np.arange(-0.05, 0.1, dt)
+    stimulus = np.zeros(len(time)) + 2.0
+    fa = []
+    for s in inputs:
+        stimulus[time>0.0] = s
+        rate, _ = mv.divisive_adaptation(time, stimulus)
+        fb = np.mean(rate[(time>-0.05)&(time<0.0)])
+        arate = rate[(time>0.0) & (time<0.1)]
+        inx = np.argmax(np.abs(arate-fb))
+        fa.append(arate[inx])
+    fig, ax = plt.subplots(figsize=(figwidth, 0.5*figwidth))
+    ax.plot(inputs, f0, c=colors['green'], label=r'$f_0(I)$', zorder=20, clip_on=False)
+    ax.plot(inputs, fs, c=colors['red'], label=r'$f_{\infty}(I)$', zorder=10, clip_on=False)
+    ax.plot(inputs, fa, c=colors['blue'], label=r'$f_{a}(I)$', zorder=10, clip_on=False)
+    ax.set_ylim(0, 200)
+    ax.set_ylabel('Spike frequency [Hz]')
+    ax.set_xlabel('Stimulus')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(50.0))
+    ax.legend(loc='upper left')
+    fig.savefig('meanvariance-divisiveficurves')
+
+
 def plot_divisiveadapt():
     dt = 0.001                    # integration time step in seconds
     tmax = 4.0                    # stimulus duration in seconds
@@ -228,7 +265,8 @@ if __name__ == "__main__":
     #plot_meansine()
     #plot_variancestimulus()
     #plot_amplitudemodulation()
-    plot_divisiveadapt()
+    plot_divisiveficurves()
+    #plot_divisiveadapt()
 
 
     
