@@ -58,6 +58,11 @@ stimulus = 1.0 - (time%T)/T
 
 ![sawtoothstimulus](ssa-sawtoothstimulus.png)
 
+> Generate
+> - a sawtooth stimulus with rising flanks
+> - a triangular stimulus
+> - a stimulus where each pulse is a parabula.
+
 A variant of generating periodic stimuli is to start out with a
 sinewave and modify it, for example by squaring it, to make the pulses
 more narrow:
@@ -68,6 +73,8 @@ stimulus = stimulus**2
 ```
 
 ![cosinestimulus](ssa-cosinestimulus.png)
+
+> Try different powers larger and smaller than one.
 
 
 ## References
