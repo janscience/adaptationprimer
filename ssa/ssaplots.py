@@ -66,7 +66,29 @@ def plot_cosinestimulus():
     fig.savefig('ssa-cosinestimulus')
     
 
+def plot_deviant():
+    tfac = 1000.0
+    n = 20             # number of pulses
+    m = 5              # deviant on every m-th pulse
+    T = 0.1            # period of the pulses in seconds
+    dt = 0.0005        # integration time step in seconds
+    time = np.arange(0.0, n*T, dt)
+    stimulus = 0.5*(1.0 - np.cos(2.0*np.pi*time/T))
+    stimulus = stimulus**2
+    deviant = np.array(stimulus)
+    deviant[time%(m*T) < (m-1)*T] = 0.0
+    # plot:
+    fig, ax = plt.subplots(figsize=(figwidth, 0.3*figwidth))
+    ax.plot(tfac*time, stimulus, color=colors['green'], clip_on=False)
+    ax.plot(tfac*time, deviant, color=colors['orange'], clip_on=False)
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
+    ax.set_xlabel('Time [ms]')
+    ax.set_ylabel('Stimulus')
+    fig.savefig('ssa-deviant')
+    
+
 if __name__ == "__main__":
     plot_pulseadaptation()
     plot_sawtoothstimulus()
     plot_cosinestimulus()
+    plot_deviant()
