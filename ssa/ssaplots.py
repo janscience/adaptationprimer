@@ -42,7 +42,7 @@ def plot_sawtoothstimulus():
     stimulus = 1.0 - (time%T)/T
     # plot:
     fig, ax = plt.subplots(figsize=(figwidth, 0.3*figwidth))
-    ax.plot(tfac*time, stimulus, clip_on=False)
+    ax.plot(tfac*time, stimulus, color=colors['green'], clip_on=False)
     ax.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
     ax.set_xlabel('Time [ms]')
     ax.set_ylabel('Stimulus')
@@ -59,7 +59,7 @@ def plot_cosinestimulus():
     stimulus = stimulus**2
     # plot:
     fig, ax = plt.subplots(figsize=(figwidth, 0.3*figwidth))
-    ax.plot(tfac*time, stimulus, clip_on=False)
+    ax.plot(tfac*time, stimulus, color=colors['green'], clip_on=False)
     ax.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
     ax.set_xlabel('Time [ms]')
     ax.set_ylabel('Stimulus')

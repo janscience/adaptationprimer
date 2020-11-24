@@ -30,7 +30,7 @@ Key is the modulo operation `%`. `time % T` is the remainder of the
 division of `time` by the period `T`. For example, `2.3 % 2.0 = 0.3`.
 
 > Print the values of the `time` array and compare them to 
-> `time % T`. Try differnt values of `T`.
+> `time % T`. Try different values of `T`.
 
 Feed this stimulus into an adapting neuron:
 
@@ -42,15 +42,15 @@ rate, adapt = adaptation(time, stimulus, alpha=0.2, taua=1.0)
 
 Note that the effective adaptation time constant during the pulses is
 much shorter than in between the pulses. Because of this asymmetry the
-neuron adapts quickly during the pulses but recovers relatively slowly
-in between. That way adaptation accumulates from pulse to pulse even
-with relatively short pulses. See Benda and Herz, 2003, for a detailed
-discussion of the relation between the adaptation time constant of the
-adaptation mechanism and the effective time constant that can be
-observed on the level of the spike frequency.
+neuron adapts quickly during the pulses, but recovers relatively
+slowly in between. That way adaptation accumulates from pulse to pulse
+even with relatively short pulses. See Benda and Herz (2003) for a
+detailed discussion of the relation between the adaptation time
+constant of the adaptation mechanism and the effective time constant
+that can be observed on the level of the spike frequency.
 
-The stimulus can be also a function of the time modulo the period. For
-example, to generate a sawtooth:
+The stimulus can also be a function of the time modulo the period. For
+example, to generate a sawtooth with falling flanks:
 
 ``` py
 stimulus = 1.0 - (time%T)/T
