@@ -104,7 +104,7 @@ def plot_deviantadaptation():
     # plot:
     fig, axs = plt.subplots(2, 1, figsize=(figwidth, 0.6*figwidth))
     ax = axs[0]
-    ax.plot(time, deviant, color=colors['orange'], label='stimulus', clip_on=False)
+    ax.plot(time, deviant, color=colors['orange'], label='deviant', clip_on=False)
     ax.plot(time, adapt, color=colors['red'], label='threshold')
     ax.set_ylabel('Stimulus')
     ax.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
@@ -118,9 +118,43 @@ def plot_deviantadaptation():
     fig.savefig('ssa-deviantadaptation')
     
 
+def plot_ssa():
+    tfac = 1000.0
+    n = 20             # number of pulses
+    m = 5              # deviant on every m-th pulse
+    T = 0.1            # period of the pulses in seconds
+    t0 = 0.03          # start of the pulse within the period in seconds
+    t1 = 0.07          # end of the pulse within the period in seconds
+    dt = 0.0005        # integration time step in seconds
+    time = np.arange(0.0, n*T, dt)
+    stimulus = np.zeros(len(time))
+    stimulus[(time%T>t0) & (time%T<t1)] = 2.0
+    deviant = np.array(stimulus)
+    deviant[time%(m*T) < (m-1)*T] = 0.0
+    rates, adapts = ssa.adaptation(time, stimulus, alpha=0.2, taua=1.0)
+    rated, adaptd = ssa.adaptation(time, deviant, alpha=0.2, taua=1.0)
+    rate = rates + rated
+    # plot:
+    fig, axs = plt.subplots(2, 1, figsize=(figwidth, 0.6*figwidth))
+    ax = axs[0]
+    ax.plot(time, stimulus, color=colors['green'], label='stimulus')
+    ax.plot(time, deviant, color=colors['orange'], label='deviant', clip_on=False)
+    ax.set_ylabel('Stimulus')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
+    ax.xaxis.set_major_formatter(ticker.NullFormatter())
+    ax.legend(loc='upper left')
+    ax = axs[1]
+    ax.plot(time, rate, color=colors['blue'], label='adapting')
+    ax.set_xlabel('Time [s]')
+    ax.set_ylabel('Spike frequency [Hz]')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
+    fig.savefig('ssa-ssa')
+    
+
 if __name__ == "__main__":
     plot_pulseadaptation()
     plot_sawtoothstimulus()
     plot_cosinestimulus()
     plot_deviant()
     plot_deviantadaptation()
+    plot_ssa()

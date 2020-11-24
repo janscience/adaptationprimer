@@ -89,6 +89,7 @@ def plot_pulseadaptation(axs, axr):
     stimulus[(time%T>t0) & (time%T<t1)] = 2.0
     rate, adapt = adaptation(time, stimulus, alpha=0.2, taua=1.0)
     # plot:
+    axs.set_title('Standard')
     axs.plot(time, stimulus, label='stimulus')
     axs.plot(time, adapt, label='threshold')
     axs.set_ylabel('Stimulus')
@@ -166,8 +167,39 @@ def plot_deviantadaptation(axs, axr):
     deviant[time%(m*T) < (m-1)*T] = 0.0
     rate, adapt = adaptation(time, deviant, alpha=0.2, taua=1.0)
     # plot:
+    axs.set_title('Deviant')
     axs.plot(time, deviant, label='stimulus')
     axs.plot(time, adapt, label='threshold')
+    axs.set_ylabel('Stimulus')
+    axs.legend(loc='upper left')
+    axr.plot(time, rate, label='adapting')
+    axr.set_xlabel('Time [s]')
+    axr.set_ylabel('Spike frequency [Hz]')
+    
+
+def plot_ssa(axs, axr):
+    """ SSA.
+    """
+    tfac = 1000.0
+    n = 20             # number of pulses
+    m = 5              # deviant on every m-th pulse
+    T = 0.1            # period of the pulses in seconds
+    t0 = 0.03          # start of the pulse within the period in seconds
+    t1 = 0.07          # end of the pulse within the period in seconds
+    dt = 0.0005        # integration time step in seconds
+    time = np.arange(0.0, n*T, dt)
+    stimulus = np.zeros(len(time))
+    stimulus[(time%T>t0) & (time%T<t1)] = 2.0
+    deviant = np.array(stimulus)
+    deviant[time%(m*T) < (m-1)*T] = 0.0
+    # responses:
+    rates, adapts = adaptation(time, stimulus, alpha=0.2, taua=1.0)
+    rated, adaptd = adaptation(time, deviant, alpha=0.2, taua=1.0)
+    rate = rates + rated
+    # plot:
+    axs.set_title('SSA')
+    axs.plot(time, stimulus, label='standard')
+    axs.plot(time, deviant, label='deviant')
     axs.set_ylabel('Stimulus')
     axs.legend(loc='upper left')
     axr.plot(time, rate, label='adapting')
@@ -179,11 +211,12 @@ def ssa_demo():
     """ Demo of stimulus-specific adaptation.
     """
     plt.rcParams['axes.xmargin'] = 0.0
-    fig, axs = plt.subplots(2, 3, constrained_layout=True)
+    fig, axs = plt.subplots(2, 4, constrained_layout=True)
     plot_pulseadaptation(axs[0,0], axs[1,0])
     plot_cosinestimulus(axs[0,1])
     plot_deviant(axs[1,1])
     plot_deviantadaptation(axs[0,2], axs[1,2])
+    plot_ssa(axs[0,3], axs[1,3])
     plt.show()
 
         

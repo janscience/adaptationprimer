@@ -35,7 +35,7 @@ division of `time` by the period `T`. For example, `2.3 % 2.0 = 0.3`.
 Feed this stimulus into an adapting neuron:
 
 ``` py
-rate, adapt = adaptation(time, stimulus, alpha=0.2, taua=1.0)
+rates, adapts = adaptation(time, stimulus, alpha=0.2, taua=1.0)
 ```
 
 ![pulseadaptation](ssa-pulseadaptation.png)
@@ -99,7 +99,7 @@ The standard stimulus is plotted in green, the deviant one in orange.
 
 The deviant stimulus is also encoded by an adapting neuron:
 ``` py
-rate, adapt = adaptation(time, deviant, alpha=0.2, taua=1.0)
+rated, adaptd = adaptation(time, deviant, alpha=0.2, taua=1.0)
 ```
 
 Using the pulse stimulus from above with 20 periods and only taking
@@ -113,10 +113,24 @@ standard pulse stimulus.
 
 ## Stimulus-specific adaptation
 
+In its simple form, the target neuron simply adds up the responses of
+the neuron encoding the standrad stimulus and of the neuron encoding
+the deviant stimulus.
+
+``` py
+rate = rates + rated
+```
+
+![ssa](ssa-ssa.png)
+
+Clearly, the deviant evokes almost unadapted responses, whereas the
+standard stimulus stays strongly adapted.
 
 
 ## References
 
 > Benda J, Herz AVM (2003) A universal model for spike-frequency adaptation. *Neural Comput.* 15, 2523-2564.
+
+> Presern J, Triblehorn JD, Schul J (2015) Dynamic dendritic compartmentalization underlies stimulus-specific adaptation in an insect neuron. *J Neurophysiol* 113: 3787-3797.
 
 > Whitmire CJ, Stanley GB (2016) Rapid sensory adaptation redux: a circuit perspective. *Neuron* 92: 298–315.
