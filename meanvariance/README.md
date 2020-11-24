@@ -270,8 +270,8 @@ stimulus-axis.
 
 Many neurons show responses that are invariant to the variance of a
 stimulus (Brenner et al., 2000, Fairhall et al., 2001, Kastner and
-Baccus, 2004).  Applying the thresholding and the divisive adaptation
-model to the stimulus from above
+Baccus, 2004, Borst et al., 2005).  Applying the thresholding and the
+divisive adaptation model to the stimulus from above
 ``` py
 stimulus[stimulus<0.0] = 0.0     # thresholding
 rate, adapt = divisive_adaptation(time, stimulus, taua=0.3, slope=0.1)
@@ -281,7 +281,9 @@ variance, except for the transients right after the steps.
 
 ![divisiveadapt](meanvariance-divisiveadapt.png)
 
-> Check how the adaptation time constant affects the response.
+For mechanisms of divisive adaptation see Borst et al. (2005).
+
+> Check out how the adaptation time constant affects the response.
 
 
 ## Adaptation to mean and variance
@@ -324,6 +326,8 @@ mean and variance, except for the transients right after the steps.
 
 
 ## References
+
+> Borst A, Flanagin VL, Sompolinsky H (2005) Adaptation without parameter change: dynamic gain control in motion detection. *PNAS* 102: 6172-6176
 
 > Brenner N, Bialek W, de Ruyter van Steveninck RR (2000) Adaptive rescaling maximizes information transmission. *Neuron* 26: 695-702.
  
