@@ -72,6 +72,14 @@ Adaptation in parallel pathways leads to stimulus-specific
 adaptation. [Read more in `ssa/`.](ssa/README.md)
 
 
+## Resolving ambiguities
+
+Absolute stimulus intensity is ambiguously encoded by an adapting
+neuron. Nonetheless, matched intrinsic adaptation allows down-stream
+neurons to robustly encode absolute stimulus intensity. [Read more in
+`ambiguities/`.](ambiguities/README.md)
+
+
 ## Contributing
 
 You are welcome to improve the code and the explanations. Or even add

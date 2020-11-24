@@ -144,3 +144,8 @@ standard stimulus stays strongly adapted.
 > Presern J, Triblehorn JD, Schul J (2015) Dynamic dendritic compartmentalization underlies stimulus-specific adaptation in an insect neuron. *J Neurophysiol* 113: 3787-3797.
 
 > Whitmire CJ, Stanley GB (2016) Rapid sensory adaptation redux: a circuit perspective. *Neuron* 92: 298–315.
+
+
+## Next
+
+Continue reading about [resolving ambiguities](../ambiguities/README.md).
