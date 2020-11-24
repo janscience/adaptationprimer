@@ -76,7 +76,7 @@ def adaptation(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, fmax=200.
 
 
 def plot_pulseadaptation(axs, axr):
-    """ Adabtation to pulse stimulus.
+    """ Adaptation to pulse stimulus.
     """
     tfac = 1000.0
     n = 5              # number of pulses
@@ -98,12 +98,44 @@ def plot_pulseadaptation(axs, axr):
     axr.set_ylabel('Spike frequency [Hz]')
     
 
+def plot_sawtoothstimulus(ax):
+    """ Periodic sawtooth stimulus.
+    """
+    tfac = 1000.0
+    n = 5              # number of pulses
+    T = 0.1            # period of the pulses in seconds
+    dt = 0.0005        # integration time step in seconds
+    time = np.arange(0.0, n*T, dt)
+    stimulus = 1.0 - (time%T)/T
+    # plot:
+    ax.plot(time, stimulus, label='stimulus')
+    ax.set_xlabel('Time [s]')
+    ax.set_ylabel('Stimulus')
+    
+
+def plot_cosinestimulus(ax):
+    """ Periodic cosine stimulus.
+    """
+    tfac = 1000.0
+    n = 5              # number of pulses
+    T = 0.1            # period of the pulses in seconds
+    dt = 0.0005        # integration time step in seconds
+    time = np.arange(0.0, n*T, dt)
+    stimulus = 0.5*(1.0 - np.cos(2.0*np.pi*time/T))
+    stimulus = stimulus**2
+    # plot:
+    ax.plot(time, stimulus, label='stimulus')
+    ax.set_xlabel('Time [s]')
+    ax.set_ylabel('Stimulus')
+    
+
 def ssa_demo():
     """ Demo of stimulus-specific adaptation.
     """
     plt.rcParams['axes.xmargin'] = 0.0
     fig, axs = plt.subplots(2, 2, constrained_layout=True)
     plot_pulseadaptation(axs[0,0], axs[1,0])
+    plot_cosinestimulus(axs[0,1])
     plt.show()
 
         

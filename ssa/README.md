@@ -13,7 +13,9 @@ full functions.
 
 ## Adaptation to pulse trains
 
-Let's generate a periodic pulse train as a stimulus
+A common experimental protocoll for stimulus-specific adaptation are
+periodic stimuli, where a stimulus is repeatably presented.  Let's
+generate a periodic pulse train as a stimulus
 ``` py
 n = 5              # number of pulses
 T = 0.1            # period of the pulses in seconds
@@ -28,7 +30,7 @@ Key is the modulo operation `%`. `time % T` is the remainder of the
 division of `time` by the period `T`. For example, `2.3 % 2.0 = 0.3`.
 
 > Print the values of the `time` array and compare them to 
-> `time % > T`. Try differnt values of `T`.
+> `time % T`. Try differnt values of `T`.
 
 Feed this stimulus into an adapting neuron:
 
@@ -46,6 +48,26 @@ with relatively short pulses. See Benda and Herz, 2003, for a detailed
 discussion of the relation between the adaptation time constant of the
 adaptation mechanism and the effective time constant that can be
 observed on the level of the spike frequency.
+
+The stimulus can be also a function of the time modulo the period. For
+example, to generate a sawtooth:
+
+``` py
+stimulus = 1.0 - (time%T)/T
+```
+
+![sawtoothstimulus](ssa-sawtoothstimulus.png)
+
+A variant of generating periodic stimuli is to start out with a
+sinewave and modify it, for example by squaring it, to make the pulses
+more narrow:
+
+``` py
+stimulus = 0.5*(1.0 - np.cos(2.0*np.pi*time/T))
+stimulus = stimulus**2
+```
+
+![cosinestimulus](ssa-cosinestimulus.png)
 
 
 ## References
