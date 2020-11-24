@@ -78,13 +78,16 @@ def adaptation(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, fmax=200.
 def plot_pulseadaptation(axs, axr):
     """ Adabtation to pulse stimulus.
     """
-    n = 5
-    T = 0.1
-    time = np.arange(0.0, n*T, 0.0005)
-    stimulus = np.zeros(len(time)) + 0.0
-    for k in range(n):
-        stimulus[(time>k*T+0.025) & (time<k*T+0.075)] = 2.0
-    rate, adapt = adaptation(time, stimulus, alpha=0.1, taua=0.3)
+    tfac = 1000.0
+    n = 5              # number of pulses
+    T = 0.1            # period of the pulses in seconds
+    t0 = 0.03          # start of the pulse within the period in seconds
+    t1 = 0.07          # end of the pulse within the period in seconds
+    dt = 0.0005        # integration time step in seconds
+    time = np.arange(0.0, n*T, dt)
+    stimulus = np.zeros(len(time))
+    stimulus[(time%T>t0) & (time%T<t1)] = 2.0
+    rate, adapt = adaptation(time, stimulus, alpha=0.2, taua=1.0)
     # plot:
     axs.plot(time, stimulus, label='stimulus')
     axs.plot(time, adapt, label='threshold')
