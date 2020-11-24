@@ -110,6 +110,9 @@ every 5-th pulse results the following response:
 The neuron still adapts to the deviant, but much less compared to the
 standard pulse stimulus.
 
+> Change the overall number of pulses and the sparsity of the deviant
+> stimulus.
+
 
 ## Stimulus-specific adaptation
 
@@ -125,6 +128,13 @@ rate = rates + rated
 
 Clearly, the deviant evokes almost unadapted responses, whereas the
 standard stimulus stays strongly adapted.
+
+> Test the robustness of stimulus-specific adaptation. How does it
+> depend on stimulus properties, like pulse duration, pulse waveform,
+> sparsity of the deviant, etc.
+
+> Add adaptaton to the target neuron. How does this effect the
+> stimulus-specific adaptation?
 
 
 ## References
