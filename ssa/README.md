@@ -49,6 +49,9 @@ detailed discussion of the relation between the adaptation time
 constant of the adaptation mechanism and the effective time constant
 that can be observed on the level of the spike frequency.
 
+> Try different values for the adaptation time constant and the
+> adaptation strength.
+
 The stimulus can also be a function of the time modulo the period. For
 example, to generate a sawtooth with falling flanks:
 
@@ -75,6 +78,21 @@ stimulus = stimulus**2
 ![cosinestimulus](ssa-cosinestimulus.png)
 
 > Try different powers larger and smaller than one.
+
+
+## Deviant stimulus
+
+For testing stimulus-specific adaptation we also need a "deviant" stimulus
+that contains a pulse only every *m*-th period.
+
+``` py
+m = 5                                  # deviant on every m-th pulse
+deviant = np.array(stimulus)           # copy the standard stimulus
+deviant[time%(m*T) < (m-1)*T] = 0.0    # set the firs m-1 pulses to zero 
+```
+
+![deviant](ssa-deviant.png)
+
 
 
 ## References
