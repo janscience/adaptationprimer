@@ -80,7 +80,7 @@ stimulus = stimulus**2
 > Try different powers larger and smaller than one.
 
 
-## Deviant stimulus
+## Adaptation to a deviant stimulus
 
 For testing stimulus-specific adaptation we also need a "deviant" stimulus
 that contains a pulse only every *m*-th period.
@@ -91,7 +91,27 @@ deviant = np.array(stimulus)           # copy the standard stimulus
 deviant[time%(m*T) < (m-1)*T] = 0.0    # set the firs m-1 pulses to zero 
 ```
 
+For a cosine stimulus with 20 periods this looks like this:
+
 ![deviant](ssa-deviant.png)
+
+The standard stimulus is plotted in green, the deviant one in orange.
+
+The deviant stimulus is also encoded by an adapting neuron:
+``` py
+rate, adapt = adaptation(time, deviant, alpha=0.2, taua=1.0)
+```
+
+Using the pulse stimulus from above with 20 periods and only taking
+every 5-th pulse results the following response:
+
+![deviantadaptation](ssa-deviantadaptation.png)
+
+The neuron still adapts to the deviant, but much less compared to the
+standard pulse stimulus.
+
+
+## Stimulus-specific adaptation
 
 
 

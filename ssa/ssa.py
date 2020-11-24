@@ -149,14 +149,41 @@ def plot_deviant(ax):
     ax.set_ylabel('Deviant')
     
 
+def plot_deviantadaptation(axs, axr):
+    """ Adaptation to rare cosine pulses.
+    """
+    tfac = 1000.0
+    n = 20             # number of pulses
+    m = 5              # deviant on every m-th pulse
+    T = 0.1            # period of the pulses in seconds
+    t0 = 0.03          # start of the pulse within the period in seconds
+    t1 = 0.07          # end of the pulse within the period in seconds
+    dt = 0.0005        # integration time step in seconds
+    time = np.arange(0.0, n*T, dt)
+    stimulus = np.zeros(len(time))
+    stimulus[(time%T>t0) & (time%T<t1)] = 2.0
+    deviant = np.array(stimulus)
+    deviant[time%(m*T) < (m-1)*T] = 0.0
+    rate, adapt = adaptation(time, deviant, alpha=0.2, taua=1.0)
+    # plot:
+    axs.plot(time, deviant, label='stimulus')
+    axs.plot(time, adapt, label='threshold')
+    axs.set_ylabel('Stimulus')
+    axs.legend(loc='upper left')
+    axr.plot(time, rate, label='adapting')
+    axr.set_xlabel('Time [s]')
+    axr.set_ylabel('Spike frequency [Hz]')
+    
+
 def ssa_demo():
     """ Demo of stimulus-specific adaptation.
     """
     plt.rcParams['axes.xmargin'] = 0.0
-    fig, axs = plt.subplots(2, 2, constrained_layout=True)
+    fig, axs = plt.subplots(2, 3, constrained_layout=True)
     plot_pulseadaptation(axs[0,0], axs[1,0])
     plot_cosinestimulus(axs[0,1])
     plot_deviant(axs[1,1])
+    plot_deviantadaptation(axs[0,2], axs[1,2])
     plt.show()
 
         
