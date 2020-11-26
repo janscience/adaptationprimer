@@ -28,6 +28,8 @@ time = np.arange(len(am_left))*dt
 am_left[time<0.1] = 0.0       # no stimulus at beginning
 ```
 
+![am](ambiguities-am.png)
+
 The stimulus to the right ear is attenuated relative to the one to the
 left ear by some attenuation factor given in decibels. We want to
 compare the responses to different attenuation factors, that is why we
@@ -49,6 +51,7 @@ stimulus for the left and the right ear to decibels.
     db_left = 10.0*np.log10(am_left)
     db_right = 10.0*np.log10(am_right)
 ```
+![dbs](ambiguities-dbs.png)
 
 The spike frequency response of the auditory receptors is mildly adapting
 
@@ -63,12 +66,22 @@ and we add some intrinsic noise to the receptor responses:
     rate_right += 10.0*whitenoise(0.0, 60.0, dt, tmax)
 ```
 
+![receptors](ambiguities-receptors.png)
+
+
+## Pattern encoder
+
 The responses of the left and the right ear are simpy summed up by the
 pattern encoding neuron:
 
 ``` py
     rate_sum = rate_left + rate_right
 ```
+
+![sum](ambiguities-sum.png)
+
+
+## Encoding sound direction
 
 The sound localization neuron needs to compute the difference between
 the responses from the left and the right ear:
@@ -77,19 +90,27 @@ the responses from the left and the right ear:
     rate_diff = rate_left - rate_right
 ```
 
+![diff](ambiguities-diff.png)
+
 But this is quite noisy and does not always encode sound direction
-(i.e. attenuation level between the ears) faithfully. Strong intrinsic
-adaptation on the difference between the two ears largely removes this
-wrong information:
+(i.e. attenuation level between the ears) faithfully. Becasue of the
+peripheral adaptation and noise, information about sound direction is
+ambiguous in the receptor responses.
+
+Strong intrinsic adaptation on the difference between the two ears
+largely removes this wrong information and this way resolves the
+problem of ambigous information about sound direction:
 
 ``` py
     rate_diff_adapt, _ = adaptation(time, rate_diff, taua=10.0, alpha=50.0, slope=0.01)
 ```
 
-Because we used a large value for the adaptation strength `alpha`, we
-need a longer adaptation time constant such that the resulting
-effective adaptation time constant roughly matches the one of the
-receptor responses.
+Because we need strong intrinsic adaptation, i.e.  a large value for
+the adaptation strength `alpha`, we need a longer adaptation time
+constant such that the resulting effective adaptation time constant
+roughly matches the one of the receptor responses.
+
+![diffadapt](ambiguities-diffadapt.png)
 
 
 ## References
