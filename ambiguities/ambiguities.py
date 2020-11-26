@@ -75,37 +75,98 @@ def adaptation(time, stimulus, taua=0.1, alpha=1.0, slope=1.0, I0=0.0, fmax=200.
     return rate, adapt
 
 
-def plot_ambiguities():
-    s = 5.0
-    I0 = -0.5
-    alpha = 10.0
-    dns = []
-    dnas = []
-    pns = []
-    dbs = np.arange(8.0, -0.1, -4.0)
-    ampls = 10**(-0.1*dbs)
-    noisel = 0.05*whitenoise(0.0, 20.0, dt, 3.0, rng)
-    noiser = 0.05*whitenoise(0.0, 20.0, dt, 3.0, rng)
-    for k, ampl in enumerate(ampls):
-        aml = 1.0*np.array(am)
-        amr = ampl*np.array(am)
-        aml[t<0.3] = 0.2
-        amr[t<0.3] = 0.2
-        dbl = np.log10(aml)
-        dbr = np.log10(amr)
-        al, fl = adaptation_sat(t, dbl, taua=5.0, alpha=alpha, s=s, I0=I0)
-        ar, fr = adaptation_sat(t, dbr, taua=5.0, alpha=alpha, s=s, I0=I0)
-        fl += noisel
-        fr += noiser
-        if k == 1:
-            ffl = fl
-            ffr = fr
-        dn = fl - fr
-        _, dna = adaptation_sat(t, dn, taua=5.0, alpha=150, taum=0.05, s=0.01, I0=0.3)
-        pn = fl + fr
-        dns.append(dn)
-        dnas.append(dna)
-        pns.append(pn)
+def whitenoise(cflow, cfup, dt, duration, rng=np.random):
+    """Band-limited white noise.
+
+    Generates white noise with a flat power spectrum between `cflow` and
+    `cfup` Hertz, zero mean and unit standard deviation.  Note, that in
+    particular for short segments of the generated noise the mean and
+    standard deviation of the returned noise can deviate from zero and
+    one.
+
+    Parameters
+    ----------
+    cflow: float
+        Lower cutoff frequency in Hertz.
+    cfup: float
+        Upper cutoff frequency in Hertz.
+    dt: float
+        Time step of the resulting array in seconds.
+    duration: float
+        Total duration of the resulting array in seconds.
+
+    Returns
+    -------
+    noise: 1-D array
+        White noise.
+    """
+    # number of elements needed for the noise stimulus:
+    n = int(np.ceil((duration+0.5*dt)/dt))
+    # next power of two:
+    nn = int(2**(np.ceil(np.log2(n))))
+    # indices of frequencies with `cflow` and `cfup`:
+    inx0 = int(np.round(dt*nn*cflow))
+    inx1 = int(np.round(dt*nn*cfup))
+    if inx0 < 0:
+        inx0 = 0
+    if inx1 >= nn/2:
+        inx1 = nn/2
+    # draw random numbers in Fourier domain:
+    whitef = np.zeros((nn//2+1), dtype=complex)
+    if inx0 == 0:
+        whitef[0] = rng.randn()
+        inx0 = 1
+    if inx1 >= nn//2:
+        whitef[nn//2] = rng.randn()
+        inx1 = nn//2-1
+    m = inx1 - inx0 + 1
+    whitef[inx0:inx1+1] = rng.randn(m) + 1j*rng.randn(m)
+    # scaling factor to ensure standard deviation of one:
+    sigma = 0.5 / np.sqrt(float(inx1 - inx0))
+    # inverse FFT:
+    noise = np.real(np.fft.irfft(whitef))[:n]*sigma*nn
+    return noise
+
+
+def plot_ambiguities(axr, axs, axd, axa):
+    # amplitude modulation stimulus for left ear:
+    dt = 0.005
+    tmax = 1.0
+    am_left = 5.0*(1.0 + 0.3*whitenoise(0.0, 20.0, dt, tmax))
+    time = np.arange(len(am_left))*dt
+    am_left[time<0.1] = 0.0
+    # loop through three attenuations of right ear:
+    decibels = [8.0, 4.0, 0.0]
+    for k, dbs in enumerate(decibels):
+        ampl = 10**(-0.1*dbs)     # attenuation factor from decibels
+        am_right = ampl*am_left   # attenuate stimulus for right ear
+        # convert to decibels (receptors are logarithmic):
+        db_left = 10.0*np.log10(am_left)
+        db_right = 10.0*np.log10(am_right)
+        # adapting receptor responses:
+        rate_left, _ = adaptation(time, db_left, taua=0.5, alpha=0.4)
+        rate_right, _ = adaptation(time, db_right, taua=0.5, alpha=0.4)
+        # neuronal noise for left and right receptor:
+        rate_left += 10.0*whitenoise(0.0, 60.0, dt, tmax)
+        rate_right += 10.0*whitenoise(0.0, 60.0, dt, tmax)
+        # sum and difference responses:
+        rate_sum = rate_left + rate_right
+        rate_diff = rate_left - rate_right
+        rate_diff_adapt, _ = adaptation(time, rate_diff, taua=10.0, alpha=50.0, slope=0.01)
+        # plot:
+        axr.plot(time, rate_right)
+        axs.plot(time, rate_sum)
+        axd.plot(time, rate_diff)
+        axa.plot(time, rate_diff_adapt, label='%g dB' % dbs)
+    axr.set_title('Receptor')
+    axr.set_ylabel('Spike frequency [Hz]')
+    axs.set_title('Sum')
+    axd.set_title('Difference')
+    axd.set_ylabel('Spike frequency [Hz]')
+    axd.set_xlabel('Time [s]')
+    axa.set_title('Difference adapted')
+    axa.set_xlabel('Time [s]')
+    axa.legend()
 
 
 def ambiguities_demo():
@@ -113,6 +174,7 @@ def ambiguities_demo():
     """
     plt.rcParams['axes.xmargin'] = 0.0
     fig, axs = plt.subplots(2, 2, constrained_layout=True)
+    plot_ambiguities(*axs.ravel())
     plt.show()
 
         
