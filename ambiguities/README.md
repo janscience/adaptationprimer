@@ -113,6 +113,15 @@ roughly matches the one of the receptor responses.
 ![diffadapt](ambiguities-diffadapt.png)
 
 
+> Explore this problem further by
+> - changing/switching off the receptor noise,
+> - modifying the adaptation strength time constant of the intrinsic
+>   adaptation of the sound direction encoder,
+> - changing the slopes of the *f-I* curves and that way influence the
+>   effect of response saturation,
+> - using a periodic pulse stimulus instead of the noise stimulus.
+
+
 ## References
 
 > Hildebrandt KJ, Ronacher B, Hennig RM, Benda J (2015) A neural mechanism for time-window separation resolves ambiguity of adaptive coding. *PLoS Biol* 13:e1002096.
