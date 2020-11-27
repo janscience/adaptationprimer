@@ -125,3 +125,8 @@ roughly matches the one of the receptor responses.
 ## References
 
 > Hildebrandt KJ, Ronacher B, Hennig RM, Benda J (2015) A neural mechanism for time-window separation resolves ambiguity of adaptive coding. *PLoS Biol* 13:e1002096.
+
+
+## Next
+
+Continue reading about [sparse codes](../sparse/README.md).

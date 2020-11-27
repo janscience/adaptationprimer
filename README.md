@@ -80,6 +80,13 @@ neurons to robustly encode absolute stimulus intensity. [Read more in
 `ambiguities/`.](ambiguities/README.md)
 
 
+## Generating sparse codes
+
+Efficient codes are both temporally and spatially sparse. Intrinsic
+adaptation together with lateral inhibition generate such sparse
+codes. [Read more in `sparse/`.](sparse/README.md)
+
+
 ## Contributing
 
 You are welcome to improve the code and the explanations. Or even add
