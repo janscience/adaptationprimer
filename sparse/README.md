@@ -63,6 +63,7 @@ evokes a sustained response in the independent neurons.
 ![plain](sparse-plain.png)
 
 > Try different positions and standard deviations of the Gaussian stimulus profile.
+
 > Vary the offset and scaling factor for the stimulus.
 
 
