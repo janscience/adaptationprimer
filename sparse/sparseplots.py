@@ -8,6 +8,32 @@ sys.path.insert(0, '..')
 from plotstyle import figwidth, colors
 
 
+def plot_spatialprofile():
+    n = 20                              # number of neurons
+    ids = np.arange(0, n, 1)            # neuron ids
+    activity = np.exp(-0.5*((ids-0.5*n)/(0.1*n))**2)
+    fig, ax = plt.subplots(figsize=(figwidth, 0.5*figwidth))
+    ax.plot(ids, activity, '-o', color=colors['red'], clip_on=False)
+    ax.set_xticks(np.arange(0, n+1, 5))
+    ax.set_xlabel('Neuron Id')
+    ax.set_ylabel('Activity')
+    fig.savefig('sparse-spatialprofile')
+
+
+def plot_spatialinhibition():
+    n = 20                              # number of neurons
+    ids = np.arange(0, n, 1)            # neuron ids
+    activity = 2.4*np.exp(-0.5*((ids-0.5*n)/(0.1*n))**2) - 1.0
+    fig, ax = plt.subplots(figsize=(figwidth, 0.5*figwidth))
+    ax.axhline(0.0, linestyle='--', color=colors['gray'])
+    ax.plot(ids, activity, '-o', color=colors['blue'], clip_on=False)
+    ax.set_xticks(np.arange(0, n+1, 5))
+    ax.set_ylim(-1.0, 1.5)
+    ax.set_xlabel('Neuron Id')
+    ax.set_ylabel('Activity')
+    fig.savefig('sparse-spatialinhibition')
+
+
 def plot_sparse():
     n = 20                              # number of neurons
     ton = 0.15                          # onset time of stimulus
@@ -85,5 +111,7 @@ def plot_sparse():
 
         
 if __name__ == "__main__":
+    plot_spatialprofile()
+    plot_spatialinhibition()
     plot_sparse()
     

@@ -27,6 +27,8 @@ neurons gets a substantial input.
 ge = np.exp(-0.5*((k-0.5*n)/(0.1*n))**2)
 ```
 
+![spatialprofile](sparse-spatialprofile.png)
+
 The input to each neuron is a rectangular stimulus waveform
 `stimulus`, scaled by the Gaussian `ge` and with an appropriate offset
 and scaling factor to result in suitable firing rates:
@@ -34,6 +36,7 @@ and scaling factor to result in suitable firing rates:
 0.95+1.2*ge*stimulus
 ```
 
+We simulate for each neuron a single trial:
 ```
 n = 20                              # number of neurons
 ton = 0.15                          # onset time of stimulus
@@ -51,16 +54,7 @@ for k in range(n):
                         noisedv=0.01)
     spikes.append(1000.0*spks)      # milliseconds
 # plotting in milliseconds:
-time *= 1000.0
-ton *= 1000.0
-toff *= 1000.0
-ax.set_title('no adaptation, no inhibition')
-ax.add_patch(mpl.patches.Rectangle((0.0, -0.5), ton, n+0.5, ec='none', lw=0, fc='#EEEEEE'))
-ax.add_patch(mpl.patches.Rectangle((toff, -0.5), ton, n+0.5, ec='none', lw=0, fc='#EEEEEE'))
 ax.eventplot(spikes, colors=['k'], lw=0.5)
-ax.set_xlim(time[0], time[-1])
-ax.set_xlabel('time [ms]')
-ax.set_ylabel('neuron')
 ```
 
 Without intrinsic adaptation and without lateral inhibition a stimulus
@@ -112,8 +106,11 @@ for k in range(n):
     spikesi.append(1000.0*spks)
 ```
 
+![spatialinhibition](sparse-spatialinhibition.png)
+
 Now only the central neurons get enough excitation to properly respond
-during the stimulus and the other ones are suppressed in their firing.
+during the stimulus and the other ones are suppressed in their firing,
+but only during the stimulation.
 
 ![inhibition](sparse-inhibition.png)
 
@@ -136,6 +133,9 @@ for k in range(n):
 And we get a temporally and spatially sparse response.
 
 ![both](sparse-both.png)
+
+Read the Betkiewicz et al. (2020) paper for more hints on how to
+properly model a proper network of integrate-and-fire neurons.
 
 
 ## References
