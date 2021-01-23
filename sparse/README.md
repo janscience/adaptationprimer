@@ -62,6 +62,9 @@ evokes a sustained response in the independent neurons.
 
 ![plain](sparse-plain.png)
 
+> Try different positions and standard deviations of the Gaussian stimulus profile.
+> Vary the offset and scaling factor for the stimulus.
+
 
 ## Adaptation, no inhibition
 
@@ -85,6 +88,8 @@ intrinsic adaptation quickly reduces the response to the rectangular
 stimulus. But still all of the neurons are firing.
 
 ![adaptation](sparse-adaptation.png)
+
+> Vary adaptation time constant and strength.
 
 
 ## No adaptation, lateral inhibition
@@ -114,6 +119,8 @@ but only during the stimulation.
 
 ![inhibition](sparse-inhibition.png)
 
+> Change the profile for the inhibition.
+
 
 ## Adaptation, lateral inhibition
 
@@ -134,8 +141,8 @@ And we get a temporally and spatially sparse response.
 
 ![both](sparse-both.png)
 
-Read the Betkiewicz et al. (2020) paper for more hints on how to
-properly model a proper network of integrate-and-fire neurons.
+> Read the Betkiewicz et al. (2020) paper for more hints on how to
+> properly model a proper network of integrate-and-fire neurons.
 
 
 ## References
