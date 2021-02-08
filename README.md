@@ -1,8 +1,9 @@
 # Neural Adaptation Primer
 
 This repository provides a tutorial on how to model neural
-adaptation. It complements the primer on "Neural adaptation" by Jan
-Benda published in Current Biology. Feel free to use and distribute
+adaptation. It complements the primer on "[Neural
+adaptation](https://doi.org/10.1016/j.cub.2020.11.054)" by Jan Benda
+published in Current Biology, 2021. Feel free to use and distribute
 the scripts and figures for teaching. The code, figures, and
 descriptions are provided under the [GNU General Public License
 v3.0](LICENSE).
@@ -26,6 +27,14 @@ python3 lifac.py
 ```
 Or open the 'lifac/lifac.py' script in your favorite IDE and run it
 from there.
+
+
+## Citation
+
+Cite this repository via the associated manuscript:
+
+> Benda, Jan (2021): Neural adaptation. *Current Biology* 31(3), R110-R116.
+> https://doi.org/10.1016/j.cub.2020.11.054
 
 
 ## Requirements
