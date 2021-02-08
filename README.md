@@ -46,7 +46,9 @@ The `python` scripts run in python version 3, using the following packages:
 - matplotlib >= 2.2.0
 
 
-## Leaky integrate-and-fire with adaptation current
+## Tutorial
+
+### Leaky integrate-and-fire with adaptation current
 
 The leaky integrate-and-fire model is a simple model of a spiking
 neuron. Augmented with a generic adaptation current it reproduces many
@@ -54,7 +56,7 @@ features of intrinsically adapting neurons. [Read more in
 `lifac/`.](lifac/README.md)
 
 
-## Spike-frequency adaptation models
+### Spike-frequency adaptation models
 
 Spike-frequency adaptation is a phenomenon observed on the level of,
 well, spike frequencies. Modeling adaptation on the level of spike
@@ -62,7 +64,7 @@ freuqencies is thus a natural choice. [Read more in
 `sfa/`.](sfa/README.md)
 
 
-## Adaptation high-pass filter
+### Adaptation high-pass filter
 
 Spike-frequency adaptation basically adds a high-pass filter to the
 neuron's input-output function. This filter operation interacts with
@@ -70,7 +72,7 @@ the non-linear *f-I* curves of the neuron. [Read
 more in `filter/`.](filter/README.md)
 
 
-## Adaptation to stimulus mean and variance
+### Adaptation to stimulus mean and variance
 
 Subtractive adaptation is perfectly suited to make the neuron's
 response invariant with respect to the mean of the
@@ -79,13 +81,13 @@ thresholding to extract the amplitude modulation and divisive
 adaptation. [Read more in `meanvariance/`.](meanvariance/README.md)
 
 
-## Stimulus-specific adaptation
+### Stimulus-specific adaptation
 
 Adaptation in parallel pathways leads to stimulus-specific
 adaptation. [Read more in `ssa/`.](ssa/README.md)
 
 
-## Resolving ambiguities
+### Resolving ambiguities
 
 Absolute stimulus intensity is ambiguously encoded by an adapting
 neuron. Nonetheless, matched intrinsic adaptation allows down-stream
@@ -93,7 +95,7 @@ neurons to robustly encode absolute stimulus intensity. [Read more in
 `ambiguities/`.](ambiguities/README.md)
 
 
-## Generating sparse codes
+### Generating sparse codes
 
 Efficient codes are both temporally and spatially sparse. Intrinsic
 adaptation together with lateral inhibition generate such sparse
