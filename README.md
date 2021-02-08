@@ -2,10 +2,10 @@
 
 This repository provides a tutorial on how to model neural
 adaptation. It complements the primer on "[Neural
-adaptation](https://doi.org/10.1016/j.cub.2020.11.054)" by Jan Benda
-published in Current Biology, 2021. Feel free to use and distribute
-the scripts and figures for teaching. The code, figures, and
-descriptions are provided under the [GNU General Public License
+adaptation](https://www.sciencedirect.com/science/article/pii/S096098222031767X)"
+by Jan Benda published in Current Biology, 2021. Feel free to use and
+distribute the scripts and figures for teaching. The code, figures,
+and descriptions are provided under the [GNU General Public License
 v3.0](LICENSE).
 
 For each of the topics listed below, there is a folder `TOPIC/`
