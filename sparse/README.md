@@ -88,6 +88,9 @@ The resulting response profile is temporally sparse, because the
 intrinsic adaptation quickly reduces the response to the rectangular
 stimulus. But still all of the neurons are firing.
 
+Adaptation removes temporal redundancy by subtracting slow,
+predictable stimulus components.
+
 ![adaptation](sparse-adaptation.png)
 
 > Vary adaptation time constant and strength.
@@ -118,6 +121,10 @@ Now only the central neurons get enough excitation to properly respond
 during the stimulus and the other ones are suppressed in their firing,
 but only during the stimulation.
 
+Lateral inhibition removes spatial redundancies by subtracting the
+activity form neighboring neurons that most likely have similar
+responses.
+
 ![inhibition](sparse-inhibition.png)
 
 > Change the profile for the inhibition.
@@ -138,7 +145,8 @@ for k in range(n):
     spikesai.append(1000.0*spks)
 ```
 
-And we get a temporally and spatially sparse response.
+And we get a temporally and spatially sparse response. Both temporal
+and spatial redundancies are reduced.
 
 ![both](sparse-both.png)
 
