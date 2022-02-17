@@ -28,10 +28,9 @@ phases. The amplitude distribution of such a stimulus is Gaussian.
 
 To generate a white noise, we draw for each frequency above a lower
 cutoff frequency `cflow` and an upper cutoff frequency `cfup` a random
-number in the complex Fourier domain, by drawing one number for the
-real part and one for the imaginary part, each from a Gaussian
-distribution. By means of an inverse Fourier transformation the
-stimulus in transformed back into the time domain.
+number in the complex Fourier domain with magnitude one and random
+phase. By means of an inverse Fourier transformation the stimulus in
+transformed back into the time domain.
 ``` py
 def whitenoise(cflow, cfup, dt, duration, rng=np.random):
     # number of elements needed for the noise stimulus:
@@ -47,19 +46,20 @@ def whitenoise(cflow, cfup, dt, duration, rng=np.random):
         inx1 = nn/2
     # draw random numbers in Fourier domain:
     whitef = np.zeros((nn//2+1), dtype=complex)
+    # zero and nyquist frequency must be real:
     if inx0 == 0:
-        whitef[0] = rng.randn()
+        whitef[0] = 0
         inx0 = 1
     if inx1 >= nn//2:
-        whitef[nn//2] = rng.randn()
+        whitef[nn//2] = 1
         inx1 = nn//2-1
-    m = inx1 - inx0 + 1
-    whitef[inx0:inx1+1] = rng.randn(m) + 1j*rng.randn(m)
-    # scaling factor to ensure standard deviation of one:
-    sigma = 0.5 / np.sqrt(float(inx1 - inx0))
+    phases = 2*np.pi*rng.rand(inx1 - inx0 + 1)
+    whitef[inx0:inx1+1] = np.cos(phases) + 1j*np.sin(phases)
     # inverse FFT:
-    noise = np.real(np.fft.irfft(whitef))[:n]*sigma*nn
-    return noise
+    noise = np.real(np.fft.irfft(whitef))
+    # scaling factor to ensure standard deviation of one:
+    sigma = nn / np.sqrt(2*float(inx1 - inx0))
+    return noise[:n]*sigma
 ```
 
 ![whitenoise](filter-whitenoise.png)
@@ -317,7 +317,8 @@ phase values).
 > factors of ten. How does this influence the estimates of the gain
 > and the phase of the firing rates and the adaptation variable?
 
-> How do the adaptation time constant and the adaptation strength influence the phase?
+> How do the adaptation time constant and the adaptation strength
+> influence the phase?
 
 > Vary the stimulus mean and standard deviation. Do they influence the
 > gain and phase curves of the firing rate and the adaptation variable?
@@ -336,4 +337,5 @@ phase values).
 
 ## Next
 
-Continue reading about [adaptation to the mean and variance](../meanvariance/README.md).
+Continue reading about [adaptation to the mean and
+variance](../meanvariance/README.md).
