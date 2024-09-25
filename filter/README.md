@@ -334,6 +334,10 @@ phase values).
 
 > Knight, BW (1972) Dynamics of encoding in a population of neurons. *J Gen Physiol* 59: 734-766.
 
+> Billah, K, Shinozuka, M (1990) Numerical method for colored-noise generation and its application to a bistable system. *Phys Rev A* 42: 7492–7495.
+
+> Škorjanc, A, Kreft, M, Benda, J (2023) Stimulator compensation and generation of Gaussian noise stimuli with defined amplitude spectra for studying input-output relations of sensory systems. *J Comp Physiol A* 209: 361-372.
+
 
 ## Next
 
