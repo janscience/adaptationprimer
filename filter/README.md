@@ -130,9 +130,9 @@ per period of the sine wave are needed for a proper estimate of its
 frequency.
 
 Note also that the returned power values are a power spectral
-*density*.  They have the unit `x**2/Hz`, with `x` being the unit of
-the data values and `Hz` is the frequency unit of the supplied `fs`
-parameter.
+*density*.  They have the unit $x^2/{\rm Hz}$, with $x$ being the unit
+of the data values and ${\rm Hz}$ is the frequency unit of the
+supplied `fs` parameter.
 
 ``` py
 import scipy.signal as sig
@@ -259,7 +259,7 @@ The other aspect of the transfer function is the phase:
 phase = np.angle(transfer)
 ax.plot(freqs, phase)
 ```
-The phase (in radians, between -&#960; and +&#960;) describes how the
+The phase (in radians, between $-\pi$ and $+\pi$ ) describes how the
 response is shifted in time relative to the stimulus at each
 frequency.
 

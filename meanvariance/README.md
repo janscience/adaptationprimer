@@ -41,11 +41,11 @@ ax.plot(time, mean)
 ![meanstimulus](meanvariance-meanstimulus.png)
 
 Compute the spike-frequency response of a non-adaptating neuron
-(&#120572; = 0)
+($\alpha = 0$)
 ``` py
 rate0, adapt0 = adaptation(time, stimulus, alpha=0.0, taua=0.5)
 ```
-and of a strongly adapting neuron (&#120572; = 0.2) to this stimulus
+and of a strongly adapting neuron ($\alpha = 0.2$) to this stimulus
 ``` py
 rate, adapt = adaptation(time, stimulus, alpha=0.2, taua=0.5)
 ```
@@ -63,7 +63,7 @@ quickly saturate and do not convey the fast stimulus components
 faithfully.
 
 Spike-frequency adaptation removes most of the different mean values,
-but not completely. The stronger the adaptation (higher &#120572;),
+but not completely. The stronger the adaptation (higher $\alpha$),
 the more the mean values will be attenuated. Because of adaptation,
 spike-frequency responses are not saturated. The non-linear shape of
 the neuron's *f-I* curves (spike frequencies cannot be negative) cuts
@@ -228,16 +228,12 @@ spike frequency in case of output driven adaptation or to the
 thresholded stimulus in case of input driven adaptation. Let's use the
 latter:
 
-<img src=
-"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Ctau_a+%5Cdot+A+%3D++-+A+%2B+%5Clfloor+I+%5Crfloor" 
-alt="\tau_a \dot A =  - A + \lfloor I \rfloor">
+$$\tau_a \dot A =  - A + \lfloor I \rfloor$$
 
 For the adaptation to scale away the changing variance of the stimulus
 it needs to act divisively and not subtractively on the input:
 
-<img src=
-"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+f+%3D+f_0%28I%2FA%29" 
-alt="f = f_0(I/A)">
+$$f = f_0(I/A)$$
 
 Without the thresholding operation this can be implemented as follows:
 ``` py

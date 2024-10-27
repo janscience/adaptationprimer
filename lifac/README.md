@@ -25,13 +25,13 @@ $$\begin{align*}
 
 The leaky integration of the membrane potential $V(t)$ with membrane
 time constant $\tau_m$ is driven by a stimulus $RI$ (input resistance
-$R$ times injected current $I(t)$) from which the adaptation current
+$R$ times injected current $I(t)$ ) from which the adaptation current
 $A$ is subtracted. The adaptation current is integrated with the
 adaptation time constant $\tau_m$. $D_v\xi$ and $D_a \xi$ are additive
 white noises for the membrane equation and adaptaion dynamics,
 respectively. Whenever the membrane voltage crosses the firing
 threshold $\theta$, a spike is generated, the adaptation current is
-incremented by &#945;, the voltage is reset to $V_r$, and integration
+incremented by $\alpha$, the voltage is reset to $V_r$, and integration
 is paused for the absolute refractory period $\tau_r$.
 
 The `lifac()` function integrates the model using Euler forward integration:

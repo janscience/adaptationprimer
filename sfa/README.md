@@ -22,31 +22,25 @@ dynamics usually is a first order low-pass filter driven by the
 spike-frequency of the neuron. This results in the following model
 (see Benda and Herz, 2003, for details):
 
-<img src=
-"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cbegin%7Balign%2A%7D%0Af+%26%3D+f_0%28I-A%29+%5C%5C%0A%5Ctau_a+%5Cdot+A+%26%3D+-+A+%2B+%5Calpha+f%0A%5Cend%7Balign%2A%7D%0A" 
-alt="\begin{align*}
+$$\begin{align*}
 f &= f_0(I-A) \\
 \tau_a \dot A &= - A + \alpha f
-\end{align*}
-">
+\end{align*}$$
 
-where *&#120591;<sub>a</sub>* is the adaptation time constant, &#945;
-is the adaptation strength, *f(t)* is the spike frequency,
-*f<sub>0</sub>(I)* is the onset (unadapted) *f-I* curve, *I(t)* the
-input, and *A(t)* is the adaptation level, i.e. the temporally
+where $\tau_a$ is the adaptation time constant, $\alpha$
+is the adaptation strength, $f(t)$ is the spike frequency,
+$f_0(I)$ is the onset (unadapted) *f-I* curve, $I(t)$ the
+input, and $A(t)$ is the adaptation level, i.e. the temporally
 averaged adaptation current.
 
 Let's model a saturating onset *f-I* curve by the upper half of a
 Boltzman function:
 
-<img src=
-"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cbegin%7Balign%2A%7D%0Af_0%28I%29+%26%3D+%5Cleft%5C%7B+%5Cbegin%7Barray%7D%7Brcl%7D+f_%7B%5Crm+max%7D%5Cfrac%7B2%7D%7B1%2Be%5E%7B-k%28I-I_0%29%7D%7D+-+1+%26+%3B+%26+I+%3E+I_0+%5C%5C+0+%26+%3B+%26+I+%3C+I_0+%5Cend%7Barray%7D+%5Cright.%0A%5Cend%7Balign%2A%7D%0A" 
-alt="\begin{align*}
+$$\begin{align*}
 f_0(I) &= \left\{ \begin{array}{rcl} f_{\rm max}\frac{2}{1+e^{-k(I-I_0)}} - 1 & ; & I > I_0 \\ 0 & ; & I < I_0 \end{array} \right.
-\end{align*}
-">
+\end{align*}$$
 
-where *f<sub>max</sub>* is the maximum firing rate, *I<sub>0</sub>* is the rheobase, i.e. the position of the *f-I* curve on the stimulus axis, and *k* sets the slope of the dynamic range.
+where $f_{\rm max}$ is the maximum firing rate, $I_0$ is the rheobase, i.e. the position of the *f-I* curve on the stimulus axis, and $k$ sets the slope of the dynamic range.
 
 Here is the code for both scalars and arrays as inputs:
 ``` py
@@ -109,17 +103,14 @@ et al., 2005).
 
 ## *f-I* curves
 
-By definition of the model, the onset *f-I* curve is
-*f<sub>0</sub>(I)* and the adapted *f-I* curves *f<sub>a</sub>(I) =
-f<sub>0</sub>(I-A)* are shifted versions of it. For a linear onset
-*f-I* curve, *f<sub>0</sub>(I)=cI* the resulting steady-state *f-I*
-curve reads
+By definition of the model, the onset *f-I* curve is $f_0(I)$ and the
+adapted *f-I* curves $f_a(I) = f_0(I-A)$ are shifted versions of
+it. For a linear onset *f-I* curve, $f_0(I)=cI$ the resulting
+steady-state *f-I* curve reads
 
-<img src=
-"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+f_%7B%5Cinfty%7D+%3D+%5Cfrac%7BI%7D%7B1%2Fc+%2B+%5Calpha%7D" 
-alt="f_{\infty} = \frac{I}{1/c + \alpha}">
+$$f_{\infty} = \frac{I}{1/c + \alpha}$$
 
-Increasing adaptation strengh &#945; reduces the gain of the
+Increasing adaptation strengh $\alpha$ reduces the gain of the
 steady-state *f-I* curve.
 
 For non-linear *f-I* curves we can compute the steady-state f-I curve
@@ -168,13 +159,11 @@ Note the linearizing effect of adaptation on the steady-state *f-I* curve
 The spike frequency, i.e. the inverse interspike intervals, can not
 follow arbitrary fast changes of the input stimulus. To a first
 approximation, a neuron integrates the firing rate along its limit
-cycle. The time *T* it needs to get once around the limit cycle,
+cycle. The time $T$ it needs to get once around the limit cycle,
 i.e. the interspike interval, is reached when the integral over the
 firing rate equals one:
 
-<img src=
-"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cint_%7B-%5Cfrac%7BT%7D%7B2%7D%7D%5E%7B%2B%5Cfrac%7BT%7D%7B2%7D%7D+f%28t%29+%5C%2C+dt+%3D+1" 
-alt="\int_{-\frac{T}{2}}^{+\frac{T}{2}} f(t) \, dt = 1">
+$$\int_{-\frac{T}{2}}^{+\frac{T}{2}} f(t) \, dt = 1$$
 
 This can be applied on the firing rates returned by the adaptation
 model as follows:
