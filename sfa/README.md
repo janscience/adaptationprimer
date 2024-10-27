@@ -36,7 +36,11 @@ averaged adaptation current.
 Let's model a saturating onset *f-I* curve by the upper half of a
 Boltzman function:
 
-$$\begin{align*}f_0(I) &= \left\{ \begin{array}{rcl} f_{\rm max}\frac{2}{1+e^{-k(I-I_0)}} - 1 & ; & I > I_0 \\ 0 & ; & I < I_0 \end{array} \right. \end{align*}$$
+```math
+\begin{align*}
+f_0(I) &= \left\{ \begin{array}{rcl} f_{\rm max}\frac{2}{1+e^{-k(I-I_0)}} - 1 & ; & I > I_0 \\ 0 & ; & I < I_0 \end{array} \right.
+\end{align*}
+```
 
 where $f_{\rm max}$ is the maximum firing rate, $I_0$ is the rheobase, i.e. the position of the *f-I* curve on the stimulus axis, and $k$ sets the slope of the dynamic range.
 
