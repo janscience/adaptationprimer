@@ -14,29 +14,25 @@ full functions.
 ## The model
 
 The leaky integrate-and-fire neuron (LIF) is extended by an adaptation
-current *A* (LIFAC, Rauch et al., 2003, Jolivet et al., 2008, Benda et
+current $A$ (LIFAC, Rauch et al., 2003, Jolivet et al., 2008, Benda et
 al., 2010, see Brette and Gerstner, 2005, for the exponential
 integrate-and-fire neuron with adaptation):
 
-<img src=
-"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cbegin%7Balign%2A%7D%0A%5Ctau_m+%5Cfrac%7BdV%7D%7Bdt%7D+%26%3D+-+V+%2B+RI+-+A+%2B+D_v%5Cxi+%5C%5C%0A%5Ctau_a+%5Cfrac%7BdA%7D%7Bdt%7D+%26%3D+-+A+%2B+D_a%5Cxi%0A%5Cend%7Balign%2A%7D" 
-alt="\begin{align*}
+$$\begin{align*}
 \tau_m \frac{dV}{dt} &= - V + RI - A + D_v\xi \\
 \tau_a \frac{dA}{dt} &= - A + D_a\xi
-\end{align*}">
+\end{align*}$$
 
-The leaky integration of the membrane potential *V(t)* with membrane
-time constant *&#120591;<sub>m</sub>* is driven by a stimulus *RI*
-(input resistance *R* times injected current *I(t)*) from which the
-adaptation current *A* is subtracted. The adaptation current is
-integrated with the adaptation time constant
-*&#120591;<sub>m</sub>*. *D<sub>v</sub>&#958;* and
-*D<sub>a</sub>&#958;* are additive white noises for the membrane
-equation and adaptaion dynamics, respectively. Whenever the membrane
-voltage crosses the firing threshold &#952;, a spike is generated, the
-adaptation current is incremented by &#945;, the voltage is reset to
-*V<sub>r</sub>*, and integration is paused for the absolute refractory
-period *&#120591;<sub>r</sub>*.
+The leaky integration of the membrane potential $V(t)$ with membrane
+time constant $\tau_m$ is driven by a stimulus $RI$ (input resistance
+$R$ times injected current $I(t)$) from which the adaptation current
+$A$ is subtracted. The adaptation current is integrated with the
+adaptation time constant $\tau_m$. $D_v\xi$ and $D_a \xi$ are additive
+white noises for the membrane equation and adaptaion dynamics,
+respectively. Whenever the membrane voltage crosses the firing
+threshold $\theta$, a spike is generated, the adaptation current is
+incremented by &#945;, the voltage is reset to $V_r$, and integration
+is paused for the absolute refractory period $\tau_r$.
 
 The `lifac()` function integrates the model using Euler forward integration:
 ``` py
